@@ -184,6 +184,7 @@ function Header() {
                         <GroupHeaderButtons />
                         {location.pathname === '/list-tasks' ? <HeaderFilter /> : null}
                     </Box>
+                    {/* поисковое поле */}
                     <Box sx={{ mr: 2 }}>
                         <Search>
                             <SearchIconWrapper>
