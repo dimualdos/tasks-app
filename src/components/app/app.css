@@ -1,0 +1,7 @@
+.darkTheme {
+  background: 100% linear-gradient(to right, #01333F, #02124A);
+}
+
+.lightTheme {
+  background: linear-gradient(to right, #0C5D71, #041654) transparent;
+}

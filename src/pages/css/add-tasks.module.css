@@ -1,0 +1,18 @@
+.reactQuillStyle {
+    background-color: #F2F2F2;
+    border-radius: 8px;
+    padding: 10px 10px;
+    min-height: 160px;
+
+}
+
+
+
+.reactQuillStyle>div[class="ql-container ql-snow"] {
+    border: none;
+    color: #242F3D;
+}
+
+.reactQuillStyle>div[class="ql-toolbar ql-snow"] {
+    border: none;
+}

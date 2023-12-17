@@ -1,0 +1,30 @@
+.colorgrey {
+    background-color: rgba(196 193 193 / 71%) !important;
+    max-width: 20%;
+}
+
+.avatar-img {
+    width: 40px;
+    height: 40px;
+
+}
+
+.rowRadioSwitch {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.h3Div {
+    margin: 0;
+}
+
+.container {
+    display: flex;
+    flex-direction: row;
+
+}
+
+.textLinkTasks {
+    text-decoration: none;
+}

@@ -1,0 +1,46 @@
+.messageContainer {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  color: var(--color-text);
+  gap: 12px;
+  margin: 0px 0px 10px 0px;
+}
+
+.ownMessageContainer {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  color: var(--color-text);
+}
+
+.message  {
+  max-width: 70%;
+  padding: 12px;
+  flex-shrink: 1;
+  border-radius: 12px;
+  min-width: 100px;
+  border: dashed 2px #90a12d;;
+}
+
+.ownMessage {
+  max-width: 70%;
+  padding: 12px;
+  flex-shrink: 1;
+  border-radius: 12px;
+  background-color: #a7b213b0;
+}
+.messageInfo {
+  display: flex;
+  width: 100%;
+  justify-content: flex-end;
+  padding-top: 4px;
+  gap: 4px;
+}
+.userName{
+  display: flex;
+}
+
+.userName{
+  display: flex;
+}
