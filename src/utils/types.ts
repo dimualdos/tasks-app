@@ -1,8 +1,8 @@
+import { User } from "@firebase/auth";
 import { SetStateAction } from "react";
 
 export interface ITasksItems {
     indexOf(arg0: never): any;
-
     id: string,
     fullNumber: string,
     link: string,
@@ -56,3 +56,20 @@ export type GlobalContent = {
 
     toggleColorMode: () => void;
 }
+
+export interface IAuthContext {
+    user: User | null,
+    isLoading: boolean,
+    register: (email: string, password: string) => Promise<void>,
+    login: (email: string, password: string) => Promise<void>,
+    logout: () => Promise<void>,
+}
+export interface IUserAuth {
+    email: string,
+    name: string,
+    _id: string,
+    avatar: any,
+    createdAt: string,
+}
+
+

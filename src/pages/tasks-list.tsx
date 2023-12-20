@@ -8,7 +8,7 @@ import styles from "./css/new-tasks.module.css";
 import { useGetAllListQuery } from "../servises/rtk-query/tasks-api";
 import { NavLink } from "react-router-dom";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import { OverflowDiv } from "../components/app/getDesignTokens";
+import { OverflowDiv } from "../constants/constant-mui";
 import { useAppSelector } from "../hooks/hooks";
 // import { fetchTasksServer, fetchTodos } from "../servises/slices/task-slice";
 

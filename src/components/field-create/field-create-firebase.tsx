@@ -19,7 +19,7 @@ export interface IFieldCreateNew {
     arrayField: IFieldObj[]
 }
 
-export const FieldCreateNew: FunctionComponent<IFieldCreateNew> = ({ arrayField }) => {
+export const FieldCreateFireBase: FunctionComponent<IFieldCreateNew> = ({ arrayField }) => {
     const itemField = arrayField && arrayField.length > 0 ? (arrayField!.map((item, index) => {
         return (
             <ItemGrid xl={6} md={6} sm={12} sx={{ p: 2 }} key={index}>
@@ -28,7 +28,6 @@ export const FieldCreateNew: FunctionComponent<IFieldCreateNew> = ({ arrayField 
                 </Box>
                 <form
                     onSubmit={item.onSubmit}
-                    method="post"
                     id={item.idForm} >
                     <Box
                         sx={{
@@ -72,7 +71,7 @@ export const FieldCreateNew: FunctionComponent<IFieldCreateNew> = ({ arrayField 
                         <HeaderButtonActive
                             variant="contained"
                             size="small"
-                            type="submit"
+                            type='submit'
                         >
                             {item.buttonText}
                         </HeaderButtonActive>

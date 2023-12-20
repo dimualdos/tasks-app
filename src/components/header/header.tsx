@@ -18,9 +18,12 @@ import GroupHeaderButtons from './header-button';
 import HeaderFilter from './header-filter';
 import { CustomizedSwitches } from '../tabs-radio/tabs-radio';
 import { Link, useLocation } from 'react-router-dom';
-import { HeaderButtonActive } from '../app/getDesignTokens';
+import { HeaderButtonActive } from '../../constants/constant-mui';
+import { userDataPath } from './user-links';
+import { StyledLink } from '../../constants/constant-mui';
+import { useAuth } from '../../hooks/hooks';
 
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
+
 
 const Search = styled('div')(({ theme }) => ({
     position: 'relative',
@@ -64,15 +67,11 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
 }));
 
-const StyledLink = styled(Link)(({ theme }) => ({
-    color: 'inherit',
-    textDecoration: 'none',
-}));
-
-
 
 function Header() {
     let location = useLocation();
+    const { logout } = useAuth();
+
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
@@ -201,7 +200,7 @@ function Header() {
                     <Box sx={{ mr: 2 }}>
                         <CustomizedSwitches />
                     </Box>
-
+                    {/* пользователь приложения  */}
                     <Box sx={{ flexGrow: 0 }}>
                         <Tooltip title="Open settings">
                             <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
@@ -225,11 +224,17 @@ function Header() {
                             open={Boolean(anchorElUser)}
                             onClose={handleCloseUserMenu}
                         >
-                            {settings.map((setting) => (
-                                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                    <Typography textAlign="center">{setting}</Typography>
+                            {userDataPath.map((setting, i) => (
+                                <MenuItem key={setting.text} onClick={handleCloseUserMenu}>
+                                    <StyledLink to={setting.path}>
+                                        <Typography textAlign="center">{setting.text}</Typography>
+                                    </StyledLink>
                                 </MenuItem>
                             ))}
+                            <Box onClick={handleCloseUserMenu}>
+                                <MenuItem onClick={logout}>Выйти</MenuItem>
+
+                            </Box>
                         </Menu>
                     </Box>
                 </Toolbar>

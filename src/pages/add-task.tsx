@@ -9,8 +9,8 @@ import { SelectRow } from "../components/select-task/select-row";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import styles from './css/add-tasks.module.css';
-import { useAppDispatch, useAppSelector } from "../hooks/hooks";
-import { HeaderButton, HeaderButtonActive, ItemGrid } from "../components/app/getDesignTokens";
+import { useAppSelector } from "../hooks/hooks";
+import { HeaderButton, HeaderButtonActive, ItemGrid } from "../constants/constant-mui";
 import { set } from "date-fns";
 
 

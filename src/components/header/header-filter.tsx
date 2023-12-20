@@ -1,18 +1,18 @@
 import * as React from 'react';
 import { FunctionComponent } from "react";
 import { styled, alpha } from '@mui/material/styles';
-import Button from '@mui/material/Button';
 import Menu, { MenuProps } from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import Box from '@mui/material/Box';
-import { BoldTextLeft, HeaderButton, HeaderButtonFilters, OverflowFilter } from '../app/getDesignTokens';
+import { BoldTextLeft, HeaderButtonFilters, OverflowFilter } from '../../constants/constant-mui';
 import Checkbox from '@mui/material/Checkbox';
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks';
 import { IChecked } from '../../utils/types';
-import { set } from 'date-fns';
 import { setFilterDirection, setFilterExecutor, setFilterStatus } from '../../servises/actions/filter-data-actions';
 import Modal from '../modal/modal';
+import { set } from 'date-fns';
+
 
 
 export interface IFilterInterface {

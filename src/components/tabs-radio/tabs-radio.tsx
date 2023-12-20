@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useDeleteTaskMutation } from '../../servises/rtk-query/tasks-api';
 import { FormControl, FormControlLabel, FormLabel, Radio, RadioGroup, ThemeProvider, styled, useTheme } from '@mui/material';
 import React from 'react';
-import { ColorModeContext } from '../../servises/color-mode-context';
+import { ColorModeContext } from '../../servises/context';
 
 
 const label = { inputProps: { 'aria-label': 'controlled' } };

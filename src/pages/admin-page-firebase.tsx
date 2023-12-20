@@ -1,14 +1,18 @@
 import { FunctionComponent, useState } from "react";
+import { styled } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { IOnChangeEvent } from "../utils/types";
 import { FieldCreateNew } from "../components/field-create/field-create-new";
 import { useAddDirectionMutation, useAddStatusMutation, useAddUserMutation } from "../servises/rtk-query/tasks-api";
 import { ItemTaskOverflow } from "../constants/constant-mui";
+import { useAuth } from "../hooks/hooks";
+import { FieldCreateFireBase } from "../components/field-create/field-create-firebase";
 
 
 
 
-export const MainPage: FunctionComponent = () => {
+export const AdminPage: FunctionComponent = () => {
+    const auth = useAuth();
     const [addUserData] = useAddUserMutation();
     const [addDirectionData] = useAddDirectionMutation();
     const [addSatusData] = useAddStatusMutation();
@@ -18,19 +22,22 @@ export const MainPage: FunctionComponent = () => {
     const [email, setEmail] = useState("");
     const [direction, setDirection] = useState("");
     const [status, setStatus] = useState("");
+    const [password, setPassword] = useState("");
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+
+    const handleSubmitRegister = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        await addUserData({
-            name: name,
-            email: email,
-        }).unwrap();
-        setName("");
+        if (!email.trim().length || !password.trim().length) {
+            alert("Заполните все поля");
+            return
+        }
+        auth.register(email, password);
+        setPassword("");
         setEmail("");
     }
 
     const removeFieldUSer = () => {
-        setName("");
+        setPassword("");
         setEmail("");
     }
 
@@ -59,16 +66,16 @@ export const MainPage: FunctionComponent = () => {
     }
     const arrayField = [{
         h2Data: "Создать пользователя",
-        onSubmit: handleSubmit,
+        onSubmit: handleSubmitRegister,
         idForm: "outlined-controlled-form",
-        label: ["Введите имя", "Введите почту"],
-        valueMass: [name, email],
-        type: ["text", "email"],
-        idTextField: ["outlined-name", "outlined-email"],
+        label: ["Введите почту", "Введите пароль"],
+        valueMass: [email, password],
+        type: ["email", "text"],
+        idTextField: ["outlined-email", "outlined-password"],
         onChange: [(event: IOnChangeEvent) => {
-            setName(event.target.value);
+            setEmail(event.target.value);
         }, (event: IOnChangeEvent) => {
-            setEmail(event.target.value)
+            setPassword(event.target.value);
         }],
         removeField: removeFieldUSer,
         buttonText: "Создать пользователя",
@@ -103,61 +110,10 @@ export const MainPage: FunctionComponent = () => {
     }]
     return (
         <ItemTaskOverflow>
-
             <Grid container display={"flex"} flexDirection={"column"} gap={"20px"} alignItems="center" xs={12}>
-                {/* <FieldCreate
-                    h2Data="Создать пользователя"
-                    onSubmit={handleSubmit}
-                    idForm={"outlined-controlled-form"}
-                    labelOne={"Введите имя"}
-                    labelTwo={"Введите почту"}
-                    valueOne={name}
-                    valueTwo={email}
-                    type1="text"
-                    type2="email"
-                    idTextFieldOne={"outlined-name"}
-                    idTextFieldTwo={"outlined-email"}
-                    onChange={(event: IOnChangeEvent) => {
-                        setName(event.target.value);
-                    }}
-
-                    onInput={(event: IOnChangeEvent) => {
-                        setEmail(event.target.value);
-                    }}
-                    removeField={removeFieldUSer}
-                    buttonText={"Создать пользователя"} />
-
-                <FieldCreate
-                    h2Data="Создать направление"
-                    onSubmit={handleSubmitDirection}
-                    idForm={"outlined-direction-form"}
-                    labelOne={"Введите направление"}
-                    valueOne={direction}
-                    type1="text"
-                    idTextFieldOne={"outlined-direction"}
-                    onChange={(event: IOnChangeEvent) => {
-                        setDirection(event.target.value);
-                    }}
-                    removeField={removeFieldDirection}
-                    buttonText={"Создать направление"} />
-
-                <FieldCreate
-                    h2Data="Создать статус"
-                    onSubmit={handleSubmitStatus}
-                    idForm={"outlined-status-form"}
-                    labelOne={"Введите статус"}
-                    valueOne={status}
-                    type1="text"
-                    idTextFieldOne={"outlined-status"}
-                    onChange={(event: IOnChangeEvent) => {
-                        setStatus(event.target.value);
-                    }}
-                    removeField={removeFieldStatus}
-                    buttonText={"Создать статус"} /> */}
-
                 {/* компонент с передачей массива данных вместо создания каждого отдельного компоненте с данными
 заодно решил проблему с onInput и onChange и использовать одинаковые компоненты и обработчики */}
-                <FieldCreateNew arrayField={arrayField} />
+                <FieldCreateFireBase arrayField={arrayField} />
             </Grid>
         </ItemTaskOverflow>
 
