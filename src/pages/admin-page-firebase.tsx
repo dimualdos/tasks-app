@@ -1,29 +1,27 @@
-import { FunctionComponent, useState } from "react";
-import { styled } from "@mui/material";
+import { FunctionComponent, useEffect, useState } from "react";
 import Grid from "@mui/material/Unstable_Grid2";
-import { IOnChangeEvent } from "../utils/types";
-import { FieldCreateNew } from "../components/field-create/field-create-new";
+import { IOnChangeEvent, IProfile } from "../utils/types";
 import { useAddDirectionMutation, useAddStatusMutation, useAddUserMutation } from "../servises/rtk-query/tasks-api";
 import { ItemTaskOverflow } from "../constants/constant-mui";
 import { useAuth } from "../hooks/hooks";
 import { FieldCreateFireBase } from "../components/field-create/field-create-firebase";
+import { collection, limit, onSnapshot, query, where } from "firebase/firestore";
+import { db } from "../utils/fire-base";
 
 
 
 
 export const AdminPage: FunctionComponent = () => {
     const auth = useAuth();
-    const [addUserData] = useAddUserMutation();
+    const user = useAuth();
+
     const [addDirectionData] = useAddDirectionMutation();
     const [addSatusData] = useAddStatusMutation();
-
     // const { statusMessage, errorMessage } = useAppSelector(state => state.tasksArray);
-    const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [direction, setDirection] = useState("");
     const [status, setStatus] = useState("");
     const [password, setPassword] = useState("");
-
 
     const handleSubmitRegister = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -32,8 +30,7 @@ export const AdminPage: FunctionComponent = () => {
             return
         }
         auth.register(email, password);
-        setPassword("");
-        setEmail("");
+        removeFieldUSer()
     }
 
     const removeFieldUSer = () => {
@@ -70,13 +67,15 @@ export const AdminPage: FunctionComponent = () => {
         idForm: "outlined-controlled-form",
         label: ["Введите почту", "Введите пароль"],
         valueMass: [email, password],
-        type: ["email", "text"],
+        type: ["email", "password"],
         idTextField: ["outlined-email", "outlined-password"],
+        name: ['email', 'password'],
         onChange: [(event: IOnChangeEvent) => {
             setEmail(event.target.value);
         }, (event: IOnChangeEvent) => {
             setPassword(event.target.value);
         }],
+
         removeField: removeFieldUSer,
         buttonText: "Создать пользователя",
     },
@@ -88,6 +87,7 @@ export const AdminPage: FunctionComponent = () => {
         valueMass: [direction],
         type: ["text"],
         idTextField: ["outlined-direction"],
+        name: ['направление'],
         onChange: [(event: IOnChangeEvent) => {
             setDirection(event.target.value);
         }],
@@ -101,7 +101,8 @@ export const AdminPage: FunctionComponent = () => {
         label: ["Введите статус"],
         valueMass: [status],
         type: ["text"],
-        idTextField: ["outlined-direction"],
+        idTextField: ["outlined-status"],
+        name: ['статус'],
         onChange: [(event: IOnChangeEvent) => {
             setStatus(event.target.value);
         }],

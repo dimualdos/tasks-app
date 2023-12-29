@@ -3,13 +3,14 @@ import { User } from "@firebase/auth";
 import { auth, db, logout, register, loginFireBase } from "../utils/fire-base";
 import { addDoc, collection } from "@firebase/firestore";
 import { AuthContext } from "../servises/context";
+import { doc, setDoc } from "firebase/firestore";
 
 
 export const AuthProvider = ({ children }: any) => {
-    const [user, setUser] = useState<User | null>(null);
+    const [userBaseData, setUserBaseData] = useState<User | null>(null);
     const [isLoadingInitial, setIsLoadingInitial] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
-
+    // console.log(userBaseData)
     const registerHandler = async (email: string, password: string) => {
         setIsLoading(true);
         // setError('');
@@ -17,10 +18,16 @@ export const AuthProvider = ({ children }: any) => {
             await register(email, password)
                 .then((userCredential) => {
                     // Signed up 
-                    const user = userCredential.user;
-                    addDoc(collection(db, 'users'), {
-                        email: user.email,
-                        _id: user.uid,
+                    const user1 = userCredential.user;
+                    setDoc(doc(db, 'users', user1!.uid), {
+                        email: user1.email,
+                        _id: user1.uid,
+                        displayName: '',
+                        avatar: '',
+                        createdAt: new Date().toISOString(),
+                        tasks: [],
+                        projects: [],
+                        direction: ''
                     })
                 });
 
@@ -58,19 +65,19 @@ export const AuthProvider = ({ children }: any) => {
     useEffect(
         () => {
             const unsubscribe = auth.onAuthStateChanged(async (user) => {
-                setUser(user || null);
+                setUserBaseData(user);
                 setIsLoadingInitial(false);
             });
             return () => unsubscribe();
         }, []);
 
     const valueAuth = useMemo(() => ({
-        user: user,
+        userBaseData: userBaseData,
         isLoading,
         register: registerHandler,
         login: loginHandler,
         logout: logoutHandler,
-    }), [user, isLoading])
+    }), [userBaseData, isLoading])
 
     return (
         <AuthContext.Provider value={valueAuth}>

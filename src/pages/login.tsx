@@ -1,65 +1,74 @@
 import { useCallback, FunctionComponent, FormEvent } from 'react';
 import { useForm, useAuth } from '../hooks/hooks';
 import styles from './css/pages.module.css';
-import TextField from '@mui/material/TextField';
+import Grid from "@mui/material/Unstable_Grid2";
+
 import { HeaderButtonActive } from '../constants/constant-mui';
+import { InputAdornments } from '../components/custom-input/custom-input';
+import { Box } from '@mui/material';
 
 
 export const LoginPage: FunctionComponent = () => {
-    const { login } = useAuth();
-    const { isLoading } = useAuth();
-    const { values, handleChange } = useForm({ email: '', password: '' });
+    const { login, isLoading } = useAuth();
+    const { dataForm, handleChange } = useForm({ email: '', password: '' });
 
     const handleClick = useCallback(async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const { email, password } = values;
+        const { email, password } = dataForm;
         await login(email, password);
-    }, [login, values]);
+    }, [login, dataForm]);
 
     return (
-        <section className={styles.centrContainer}>
-            <div className={styles.container}>
+        <Grid container sx={{
+            display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: "wrap"
+        }} xs={12}
+        >
+            <Grid xs={4} sx={{ justifyContent: 'center' }}>
                 <form
                     onSubmit={handleClick}
                     className={styles.form}>
-                    <h1 className={styles.heading}>Вход</h1>
-                    <TextField
-                        placeholder="E-mail"
-                        value={values.email}
-                        name="email"
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e)} />
+                    <Grid sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '20px', ":first-child": { textAlign: 'center' },
+                        ":last-child": { alignContent: "center" }
+                    }} xl={12} md={8}>
+                        <h1 >Вход</h1>
 
-                    <TextField
-                        placeholder="Пароль"
-                        value={values.password}
-                        name="password"
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e)}
-                    />
-                    <HeaderButtonActive
-                        type='submit'
-                        className={styles.buttonConstructor}>
-                        <p className={styles.buttonText}>Войти</p>
-                    </HeaderButtonActive>
+                        <InputAdornments
+                            placeholderInput="E-mail"
+                            valueInput={dataForm.email}
+                            nameInput="email"
+                            typeInput="email"
+                            onChangeInput={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e)}
+                            ariaLabelInput="E-mail"
+                        />
+                        <InputAdornments
+                            placeholderInput="Пароль"
+                            valueInput={dataForm.password}
+                            nameInput="password"
+                            typeInput='password'
+                            onChangeInput={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e)}
+                            ariaLabelInput="password"
+
+                        />
+
+                        <Box >
+                            <HeaderButtonActive
+                                type='submit'
+                                className={styles.buttonConstructor}>
+                                <p className={styles.buttonText}>Войти</p>
+                            </HeaderButtonActive>
+
+                        </Box>
+
+                    </Grid>
+
                 </form>
+            </Grid>
 
-                {/* <div className={styles.containerBottom}>
-                    <div className={styles.divPerson}>
-                        <p className={styles.textPerson}>Вы - новый пользователь?
-                            <Link to={{ pathname: `/register` }}
-                                className={styles.textLinkPerson}> Зарегистрироваться</Link>
-                        </p>
-                    </div>
 
-                    <div className={styles.divPerson}>
-                        <p className={styles.textPerson}>Забыли пароль?
-                            <Link to={{ pathname: `/forgot-password` }}
-                                className={styles.textLinkPerson}> Восстановить пароль</Link>
-                        </p>
-                    </div>
-                </div> */}
-
-            </div>
-        </section>
+        </Grid>
 
     )
 }

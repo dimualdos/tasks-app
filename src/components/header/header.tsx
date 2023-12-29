@@ -22,6 +22,8 @@ import { HeaderButtonActive } from '../../constants/constant-mui';
 import { userDataPath } from './user-links';
 import { StyledLink } from '../../constants/constant-mui';
 import { useAuth } from '../../hooks/hooks';
+import { auth } from '../../utils/fire-base';
+import { deepOrange } from '@mui/material/colors';
 
 
 
@@ -71,6 +73,7 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 function Header() {
     let location = useLocation();
     const { logout } = useAuth();
+    const user = auth.currentUser;
 
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
@@ -201,42 +204,45 @@ function Header() {
                         <CustomizedSwitches />
                     </Box>
                     {/* пользователь приложения  */}
-                    <Box sx={{ flexGrow: 0 }}>
-                        <Tooltip title="Open settings">
-                            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-                            </IconButton>
-                        </Tooltip>
+                    {user ? (
+                        <Box sx={{ flexGrow: 0 }}>
+                            <Tooltip title="Open settings">
+                                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                                    <Avatar alt="name" src={user!.photoURL!} />
+                                </IconButton>
+                            </Tooltip>
 
-                        <Menu
-                            sx={{ mt: '45px' }}
-                            id="menu-appbar"
-                            anchorEl={anchorElUser}
-                            anchorOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                            }}
-                            keepMounted
-                            transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                            }}
-                            open={Boolean(anchorElUser)}
-                            onClose={handleCloseUserMenu}
-                        >
-                            {userDataPath.map((setting, i) => (
-                                <MenuItem key={setting.text} onClick={handleCloseUserMenu}>
-                                    <StyledLink to={setting.path}>
-                                        <Typography textAlign="center">{setting.text}</Typography>
-                                    </StyledLink>
-                                </MenuItem>
-                            ))}
-                            <Box onClick={handleCloseUserMenu}>
-                                <MenuItem onClick={logout}>Выйти</MenuItem>
+                            <Menu
+                                sx={{ mt: '45px' }}
+                                id="menu-appbar"
+                                anchorEl={anchorElUser}
+                                anchorOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
+                                }}
+                                keepMounted
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
+                                }}
+                                open={Boolean(anchorElUser)}
+                                onClose={handleCloseUserMenu}
+                            >
+                                {userDataPath.map((setting, i) => (
+                                    <MenuItem key={setting.text} onClick={handleCloseUserMenu}>
+                                        <StyledLink to={setting.path}>
+                                            <Typography textAlign="center">{setting.text}</Typography>
+                                        </StyledLink>
+                                    </MenuItem>
+                                ))}
+                                <Box onClick={handleCloseUserMenu}>
+                                    <MenuItem onClick={logout}>Выйти</MenuItem>
 
-                            </Box>
-                        </Menu>
-                    </Box>
+                                </Box>
+                            </Menu>
+                        </Box>
+                    ) : null}
+
                 </Toolbar>
             </Container>
         </AppBar >

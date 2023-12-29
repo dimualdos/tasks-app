@@ -1,5 +1,6 @@
 import { User } from "@firebase/auth";
-import { SetStateAction } from "react";
+import { Firestore } from "firebase/firestore";
+import { ChangeEvent, ChangeEventHandler, FormEvent, SetStateAction } from "react";
 
 export interface ITasksItems {
     indexOf(arg0: never): any;
@@ -58,11 +59,12 @@ export type GlobalContent = {
 }
 
 export interface IAuthContext {
-    user: User | null,
+    userBaseData: User | null,
     isLoading: boolean,
     register: (email: string, password: string) => Promise<void>,
     login: (email: string, password: string) => Promise<void>,
     logout: () => Promise<void>,
+    uid?: string,
 }
 export interface IUserAuth {
     email: string,
@@ -71,5 +73,39 @@ export interface IUserAuth {
     avatar: any,
     createdAt: string,
 }
-
+export interface IProfile {
+    _id: string;
+    displayName: string;
+    docId: string;
+    user?: any;
+    email?: string;
+    photoURL?: string;
+}
+export interface IFieldObj {
+    h2Data: string;
+    idForm: string;
+    onSubmit: { (event: React.FormEvent<HTMLFormElement>): Promise<void> };
+    label: string[];
+    valueMass: string[];
+    type: string[];
+    idTextField: string[];
+    onChange: ((event: IOnChangeEvent) => void)[];
+    removeField: () => void;
+    buttonText: string;
+    name: string[];
+}
+export interface IFieldCreateNew {
+    arrayField: IFieldObj[]
+}
+export interface IInputAdorments {
+    passwordInput?: boolean;
+    keyInput?: string,
+    idInput?: any,
+    placeholderInput?: string,
+    valueInput?: string,
+    onChangeInput?: any,
+    typeInput?: string,
+    nameInput?: string,
+    ariaLabelInput?: string,
+}
 

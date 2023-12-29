@@ -26,19 +26,8 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);
-export const auth = getAuth(app);
-// const user = auth.currentUser;
-// onAuthStateChanged(auth, (user) => {
-//   if (user) {
-//     // User is signed in, see docs for a list of available properties
-//     // https://firebase.google.com/docs/reference/js/auth.user
-//     const uid = user.uid;
-//     // ...
-//   } else {
-//     // User is signed out
-//     // ...
-//   }
-// });
+export const auth = getAuth();
+ export const user = auth.currentUser;
 export const register =
  (email: string, password: string) =>
   createUserWithEmailAndPassword(auth, email, password);
@@ -52,3 +41,4 @@ export const googleProvider = new GoogleAuthProvider();
 export const oAuthProvider = new OAuthProvider('google.com');
 // export const signInWithGithub = () => signInWithCredential(auth, githubProvider.credential());
 // export const signInWithGoogle = () => signInWithCredential(auth, googleProvider.credential());
+

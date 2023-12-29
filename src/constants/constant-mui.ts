@@ -2,6 +2,7 @@ import { Box, Button, Checkbox,  Paper,  styled } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { Link } from "react-router-dom";
 import styles from '@emotion/styled';
+import { IOnChangeEvent } from "../utils/types";
 
 
 export const ItemGrid = styled(Grid)(({ theme }) => ({
@@ -27,7 +28,7 @@ export const HeaderButtonActive = styled(Button)(({ theme }) => ({
     backgroundColor: theme.palette.mode === "dark" ? theme.palette.secondary.main : theme.palette.primary.dark,
     color: `${theme.palette.mode === "dark" ? theme.palette.primary.contrastText : theme.palette.primary.light}`,
     border: `${theme.palette.mode === "dark" ? theme.palette.secondary.main : theme.palette.primary.dark} 2px solid`,
-
+    minWidth: "100px"
 }));
 export const HeaderButton = styled(Button)(({ theme }) => ({
     backgroundColor: theme.palette.mode === "dark" ? theme.palette.primary.light : theme.palette.primary.main,
@@ -138,3 +139,15 @@ export const headerLinkModal = styles.div`
   justify-content: flex-end;
   gap: 36px;
 `;
+
+export const TextTheme = styled('p')(({ theme }) => ({
+    color: theme.palette.mode === "dark" ? theme.palette.primary.contrastText : theme.palette.primary.main,
+   }));
+   export const H1Theme = styled('h1')(({ theme }) => ({
+    color: theme.palette.mode === "dark" ? theme.palette.primary.contrastText : theme.palette.primary.main,
+   }));
+   export const H3Theme = styled('h3')(({ theme }) => ({
+    color: theme.palette.mode === "dark" ? theme.palette.primary.contrastText : theme.palette.primary.main,
+   }));
+
+
