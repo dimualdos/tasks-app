@@ -41,3 +41,24 @@ You're about to initialize a Firebase project in this directory:
     at process.processTicksAndRejections (node:internal/process/task_queues:95:5)
 [error] 
 [error] Error: Failed to list Firebase projects. See firebase-debug.log for more info.
+[debug] [2023-12-29T08:30:24.614Z] ----------------------------------------------------------------------
+[debug] [2023-12-29T08:30:24.617Z] Command:       C:\Program Files\nodejs\node.exe C:\Users\Дмитрий\AppData\Roaming\npm\node_modules\firebase-tools\lib\bin\firebase.js init
+[debug] [2023-12-29T08:30:24.617Z] CLI Version:   13.0.2
+[debug] [2023-12-29T08:30:24.617Z] Platform:      win32
+[debug] [2023-12-29T08:30:24.617Z] Node Version:  v20.10.0
+[debug] [2023-12-29T08:30:24.617Z] Time:          Fri Dec 29 2023 12:30:24 GMT+0400 (Персидский залив)
+[debug] [2023-12-29T08:30:24.617Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2023-12-29T08:30:24.623Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2023-12-29T08:30:24.623Z] > authorizing via signed-in user (dimualdos@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  D:\программирование\Project-Den-SRM\tasks-app
+
