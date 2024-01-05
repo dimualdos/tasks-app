@@ -1,32 +1,47 @@
-import React, { FC, useRef, ChangeEvent } from "react";
-
+import React, { FC, ChangeEvent, useRef } from "react";
 import { FieldCreateFireBase } from "../components/field-create/field-create-firebase";
-import { auth, db } from "../utils/fire-base";
+import { auth, db, getStorageFirebase } from "../utils/fire-base";
 import { IOnChangeEvent } from "../utils/types";
-import { Avatar, Box, Input } from "@mui/material";
+import { Avatar, Box, styled } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import { doc, updateDoc } from "firebase/firestore";
-import { H1Theme, H3Theme, ItemTaskOverflow } from "../constants/constant-mui";
+import { doc, updateDoc, } from "firebase/firestore";
+import { H1Theme, H3Theme, HeaderButton, HeaderButtonActive, ItemGrid, ItemTaskOverflow } from "../constants/constant-mui";
 import { useState } from "react";
-import { EmailAuthProvider, reauthenticateWithCredential, updateEmail, updateProfile } from "firebase/auth";
+import { updateEmail, updateProfile } from "firebase/auth";
 import { useUpdateEmail } from 'react-firebase-hooks/auth';
+import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { useAuth } from "../hooks/hooks";
+import { useProfile } from "../hooks/use-profile";
+
+const InputElement = styled('input')(
+    ({ theme }) => `
+ 
+  padding: 8px 12px;
+  outline: 0;
+`,
+);
 
 
 export const ProfileUser: FC = () => {
-    // const userData = useAuth();
     const user = auth.currentUser;
-    // const { profile } = useProfile();
-    const fileInput = useRef<HTMLDivElement>();
-    const [updateEmail, updating, error] = useUpdateEmail(auth);
+    // const userData = useAuth();
+    // const user = userData.userBaseData;
+    const { profile } = useProfile();
 
+    const [updateEmail, updating, error] = useUpdateEmail(auth);
     const [email, setEmail] = useState("");
     const [name, setName] = useState("");
     const [password, setPassword] = useState("");
-    const [file, setFile] = useState<File>();
+    const [filePhoto, setFilePhoto] = useState<any>();
+    const fileInput = useRef<any>(null);
+    const [isLoading, setIsLoading] = useState(false);
+    const docRef = doc(db, "users", `${user?.uid}`);
+    const [errorState, setErrorState] = useState<unknown | null>(null);
+
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
-            setFile(e.target.files[0]);
+            setFilePhoto(e.target.files[0]);
         }
     };
 
@@ -40,24 +55,47 @@ export const ProfileUser: FC = () => {
     if (updating) {
         return <p>Updating...</p>;
     }
+
     const updatePhotoUser = async (event: { preventDefault: () => void; }) => {
         event.preventDefault();
-        if (!user) return;
-        // console.log(fileInput.current.files[0].name)
-        const docRef = doc(db, "users", `${user?.uid}`);
+        if (!user || !filePhoto || !auth) return;
+        try {
+            setIsLoading(true)
+            // 2 - Upload the image to Cloud Storage.
+            const filePath = `${auth.currentUser!.uid}/${fileInput.current.files[0].name}`;
+            //const filePath = `${auth.currentUser!.uid}/${filePhoto.name}`;
 
-        await updateDoc(docRef, {
-            photoURL: "kjbn"
-        });
-        // await updateProfile(user, {
-        //     photoURL: file 
-        // })
+            const newImageRef = ref(getStorageFirebase, filePath);
+            const fileSnapshot = await uploadBytesResumable(newImageRef, fileInput.current.files[0]);
+            // 3 - Generate a public URL for the file
+            const publicImageUrl = await getDownloadURL(newImageRef);
+            // 4 - Update the photo placeholder with the image's URL.
+            await updateProfile(user, {
+                photoURL: publicImageUrl
+            })
+            await updateDoc(docRef, {
+                photoURL: publicImageUrl,
+                storageUri: fileSnapshot.metadata.fullPath
+            });
+            setTimeout(() => {
+                removeFildePhoto();
+                setIsLoading(false);
+            }, 500)
+        } catch (error) {
+            setErrorState(error);
+        } finally {
+            removeFildePhoto();
+            setIsLoading(false);
+            setTimeout(() => {
+                setErrorState(null);
+            }, 5000)
+        }
     }
+
     const updateNameUser = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (!user || !name.trim().length) return;
         try {
-            const docRef = doc(db, "users", `${user?.uid}`);
 
             await updateDoc(docRef, {
                 displayName: name
@@ -103,6 +141,12 @@ export const ProfileUser: FC = () => {
         setEmail('');
         setPassword('');
     }
+    const removeFildePhoto = () => {
+        setFilePhoto(null);
+        fileInput.current.value = null;
+    }
+
+
     const arrayField = [
         {
             h2Data: "Изменить имя",
@@ -123,7 +167,7 @@ export const ProfileUser: FC = () => {
             h2Data: "Изменить почту",
             onSubmit: updateEmailUser,
             idForm: 'id-email',
-            label: ["Введите почту", "Выберите фото"],
+            label: ["Введите почту"],
             type: ["email"],
             valueMass: [email],
             idTextField: ["email"],
@@ -155,30 +199,56 @@ export const ProfileUser: FC = () => {
         <ItemTaskOverflow>
             {/* {isLoading ? <p>Loading...</p> : null} */}
             {/* {isSucces ? <p>Изменения сохранены!</p> : null} */}
-            {user! && user!.uid ? (
+            {profile! && profile._id ? (
                 <Grid container display={"flex"} flexDirection={"column"} alignItems="center" xs={12}>
 
                     <Grid sx={{ display: 'flex', flexDirection: 'row', gap: '20px', alignItems: 'center', justifyContent: 'center' }} xs={12}>
                         <Box sx={{ gap: '5px', display: 'flex', alignItems: 'center' }}>
-                            <Avatar alt="фото пользователя" src={user!.photoURL!} />
-                            <H3Theme>{user! && user.displayName ? user.displayName : "нет имени"}</H3Theme>
+                            <Avatar alt="фото пользователя" src={profile.photoURL} />
+                            <H3Theme>{profile && profile.displayName ? profile.displayName : "нет имени"}</H3Theme>
                         </Box>
-                        <H3Theme>Почта: {user ? user.email : 'нет почты'}</H3Theme>
+                        <H3Theme>Почта: {profile ? profile.email : 'нет почты'}</H3Theme>
                     </Grid>
 
                     <H1Theme>Ваш профиль</H1Theme>
                     <Grid sx={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center', justifyContent: 'center' }} xs={12}>
+                        {/* обновление данных профиля */}
                         <FieldCreateFireBase arrayField={arrayField} />
-                        <form onSubmit={updatePhotoUser}>
-                            <label>
-                                Выберите фото:
-                                <Input
-                                    type={"file"}
-                                    onChange={handleFileChange}
-                                />
-                            </label>
-                            <button type="submit">Сохранить</button>
-                        </form>
+
+                        {/* обговление фото профиля */}
+                        <ItemGrid xl={6} md={6} sm={12} sx={{ p: 2 }} >
+                            <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
+                                <h2 >Обновить фото профиля</h2>
+                            </Box>
+                            <form onSubmit={updatePhotoUser}>
+                                <Box sx={{ display: 'flex', justifyContent: 'center', text: 'center', m: 1, }}>
+                                    <label >
+                                        <InputElement sx={{ borderRadius: '15px' }}
+                                            name="img"
+                                            type={"file"}
+                                            // id='id-img-input'
+                                            ref={fileInput}
+                                            onChange={handleFileChange}
+                                        />
+
+                                    </label>
+                                </Box>
+
+                                <Box sx={{ mb: 1, mr: 1, display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '1em' }}>
+                                    <HeaderButton
+                                        variant="contained"
+                                        size="small"
+                                        type="button"
+                                        onClick={removeFildePhoto}
+                                    >
+                                        Очистить поле
+                                    </HeaderButton>
+                                    {isLoading ? <HeaderButtonActive >Идет отправка</HeaderButtonActive>
+                                        : <HeaderButtonActive type="submit">Обновить фото</HeaderButtonActive>}
+                                </Box>
+                                {errorState ? <p>{`${errorState}`}</p> : null}
+                            </form>
+                        </ItemGrid>
                     </Grid>
                 </Grid>
             ) : null}
@@ -188,5 +258,7 @@ export const ProfileUser: FC = () => {
 
     );
 }
+
+
 
 

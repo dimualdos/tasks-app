@@ -20,10 +20,10 @@ export const LoginPage: FunctionComponent = () => {
 
     return (
         <Grid container sx={{
-            display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: "wrap"
+            justifyContent: 'center'
         }} xs={12}
         >
-            <Grid xs={4} sx={{ justifyContent: 'center' }}>
+            <Grid xs={12} sm={6} md={6} lg={4} >
                 <form
                     onSubmit={handleClick}
                     className={styles.form}>

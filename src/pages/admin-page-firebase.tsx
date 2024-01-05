@@ -13,7 +13,6 @@ import { db } from "../utils/fire-base";
 
 export const AdminPage: FunctionComponent = () => {
     const auth = useAuth();
-    const user = useAuth();
 
     const [addDirectionData] = useAddDirectionMutation();
     const [addSatusData] = useAddStatusMutation();

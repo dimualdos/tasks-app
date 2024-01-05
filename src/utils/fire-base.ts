@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+import { getApp, initializeApp } from "firebase/app";
 import { getFirestore } from '@firebase/firestore';
 import {
      getAuth,
@@ -13,21 +13,27 @@ import {
      GoogleAuthProvider,
      onAuthStateChanged,
   } from 'firebase/auth';
+  import { getStorage } from "firebase/storage";
 
 const firebaseConfig = {
   apiKey: "AIzaSyAV3worDwSBYWV3OvICa6OeGuuMQcuO5M8",
   authDomain: "tasks-app-707e8.firebaseapp.com",
   projectId: "tasks-app-707e8",
-  storageBucket: "tasks-app-707e8.appspot.com",
+  storageBucket: "tasks-app-707e8.appspot.com" , 
   messagingSenderId: "292583529058",
-  appId: "1:292583529058:web:78f4deaa8e32cd2deccf3b"
+  appId: "1:292583529058:web:78f4deaa8e32cd2deccf3b",
 };
 
 const app = initializeApp(firebaseConfig);
 
+const firebaseApp = getApp();
+export const getStorageFirebase = getStorage();
+//export const imagesRef = ref(storage, 'users-photo/' + File.name);
+
+// const storage = getStorage(firebaseApp, "gs://tasks-app-707e8.appspot.com");
+
 export const db = getFirestore(app);
-export const auth = getAuth();
- export const user = auth.currentUser;
+export const auth = getAuth(app);
 export const register =
  (email: string, password: string) =>
   createUserWithEmailAndPassword(auth, email, password);

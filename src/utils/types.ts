@@ -39,7 +39,9 @@ export interface IUserData {
 
 export interface IOnChangeEvent {
     // preventDefault(): unknown;
-    target: { value: SetStateAction<string> },
+    target: {
+        files?: any; value: SetStateAction<string> 
+},
 }
 
 export interface IChecked {
@@ -85,14 +87,14 @@ export interface IFieldObj {
     h2Data: string;
     idForm: string;
     onSubmit: { (event: React.FormEvent<HTMLFormElement>): Promise<void> };
-    label: string[];
-    valueMass: string[];
+    label?: string[];
+    valueMass?: string[];
     type: string[];
-    idTextField: string[];
+    idTextField?: string[];
     onChange: ((event: IOnChangeEvent) => void)[];
-    removeField: () => void;
+    removeField: any;
     buttonText: string;
-    name: string[];
+    name?: string[];
 }
 export interface IFieldCreateNew {
     arrayField: IFieldObj[]

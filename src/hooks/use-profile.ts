@@ -14,12 +14,11 @@ const [name, setName] = useState('');
 useEffect(() => {
 if(!userData.userBaseData) {return};
 
-const q = query(collection(db, "users"), where('_id', "==", userData!.userBaseData.uid), limit(1));
+ const q = query(collection(db, "users"), where('_id', "==", userData!.userBaseData.uid), limit(1));
 
 onSnapshot(q, snapshot => {
      const dataProfile = snapshot.docs.map(d => ({
-    ...(d.data() as IProfile),
-     docId: d.id,
+    ...(d.data() as IProfile)
   
   }))[0];
     setProfile(dataProfile)

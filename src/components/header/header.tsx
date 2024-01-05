@@ -24,6 +24,7 @@ import { StyledLink } from '../../constants/constant-mui';
 import { useAuth } from '../../hooks/hooks';
 import { auth } from '../../utils/fire-base';
 import { deepOrange } from '@mui/material/colors';
+import { useProfile } from '../../hooks/use-profile';
 
 
 
@@ -73,8 +74,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 function Header() {
     let location = useLocation();
     const { logout } = useAuth();
+    const { profile } = useProfile();
     const user = auth.currentUser;
-
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
 
@@ -204,11 +205,11 @@ function Header() {
                         <CustomizedSwitches />
                     </Box>
                     {/* пользователь приложения  */}
-                    {user ? (
+                    {user && profile.photoURL ? (
                         <Box sx={{ flexGrow: 0 }}>
                             <Tooltip title="Open settings">
                                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                    <Avatar alt="name" src={user!.photoURL!} />
+                                    {profile.photoURL && <Avatar alt="name" src={profile.photoURL} />}
                                 </IconButton>
                             </Tooltip>
 

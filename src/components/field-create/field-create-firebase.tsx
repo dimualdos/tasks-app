@@ -10,7 +10,7 @@ export const FieldCreateFireBase: FunctionComponent<IFieldCreateNew> = ({ arrayF
     const itemField = arrayField && arrayField!.length > 0 ? (arrayField!.map((item, index) => {
         return (
             <ItemGrid xl={6} md={6} sm={12} sx={{ p: 2 }} key={index}>
-                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', gap: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2 }}>
                     <h2 >{item.h2Data}</h2>
                 </Box>
                 <form
@@ -21,29 +21,29 @@ export const FieldCreateFireBase: FunctionComponent<IFieldCreateNew> = ({ arrayF
                             '& > :not(style)': { m: 1, width: '98%' },
                         }}
                     >
-                        {item && item!.valueMass!.length > 1 ? (item!.label!.map((itemValue: string, i: number) => {
+                        {item && item!.label!.length > 1 ? (item!.label!.map((itemValue: string, i: number) => {
                             return (
                                 <InputAdornments
                                     key={i}
-                                    idInput={item.idTextField[i]}
+                                    idInput={item.idTextField![i]}
                                     typeInput={item.type[i]}
-                                    ariaLabelInput={item.label[i]}
-                                    placeholderInput={item.label[i]}
+                                    ariaLabelInput={item.label![i]}
+                                    placeholderInput={item.label![i]}
                                     // variant="filled"
-                                    valueInput={item.valueMass[i]}
-                                    onChangeInput={item.onChange[i]}
-                                    nameInput={item.name[i]}
+                                    valueInput={item.valueMass![i]}
+                                    onChangeInput={item.onChange![i]}
+                                    nameInput={item.name![i]}
                                 />
                             )
                         })) : (
                             <InputAdornments
-                                idInput={item.idTextField[0]}
+                                idInput={item.idTextField![0]}
                                 typeInput={item.type[0]}
-                                ariaLabelInput={item.label[0]}
-                                placeholderInput={item.label[0]}
-                                valueInput={item.valueMass[0]}
-                                onChangeInput={item.onChange[0]}
-                                nameInput={item.name[0]}
+                                ariaLabelInput={item.label![0]}
+                                placeholderInput={item.label![0]}
+                                valueInput={item.valueMass![0]}
+                                onChangeInput={item.onChange![0]}
+                                nameInput={item.name![0]}
                             />
                         )}
                     </Box>
