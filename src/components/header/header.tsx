@@ -23,7 +23,6 @@ import { userDataPath } from './user-links';
 import { StyledLink } from '../../constants/constant-mui';
 import { useAuth } from '../../hooks/hooks';
 import { auth } from '../../utils/fire-base';
-import { deepOrange } from '@mui/material/colors';
 import { useProfile } from '../../hooks/use-profile';
 
 
@@ -185,6 +184,7 @@ function Header() {
                     </Box>
                     <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
                         <GroupHeaderButtons />
+                        {/* фильтр кнопка */}
                         {location.pathname === '/list-tasks' ? <HeaderFilter /> : null}
                     </Box>
                     {/* поисковое поле */}
@@ -245,6 +245,7 @@ function Header() {
                     ) : null}
 
                 </Toolbar>
+
             </Container>
         </AppBar >
     );

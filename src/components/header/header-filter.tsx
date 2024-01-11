@@ -12,6 +12,7 @@ import { IChecked } from '../../utils/types';
 import { setFilterDirection, setFilterExecutor, setFilterStatus } from '../../servises/actions/filter-data-actions';
 import Modal from '../modal/modal';
 import { set } from 'date-fns';
+import { useDirections } from '../../hooks/use-direction';
 
 
 
@@ -74,6 +75,8 @@ const StyledMenu = styled((props: MenuProps) => (
 }));
 
 const HeaderFilter: FunctionComponent = () => {
+    const { directionsListFB } = useDirections();
+
     const dispatch = useAppDispatch();
     const statuseList = useAppSelector(state => state.dataLists.statuseList);
     const directionsList = useAppSelector(state => state.dataLists.directionsList);
@@ -89,15 +92,15 @@ const HeaderFilter: FunctionComponent = () => {
         let statuseData: React.SetStateAction<any> = [];
         let directionsData: React.SetStateAction<any> = [];
         let executorData: React.SetStateAction<any> = [];
-        if (statuseList && statuseList.length > 0 && directionsList.length > 0 && usersList.length > 0) {
+        if (statuseList && statuseList.length > 0 && directionsListFB.length > 0 && usersList.length > 0) {
             statuseData = statuseList && statuseList.map((statuse: any) => (statuse = { name: statuse.name, id: statuse.ref, checked: false }));
-            directionsData = directionsList.map((directions: any) => (directions = { name: directions.name, id: directions.ref, checked: false }));
+            directionsData = directionsListFB.map((directions: any, i: number) => (directions = { name: directions.name, id: i, checked: false }));
             executorData = usersList.map((executor: any) => (executor = { name: executor.name, id: executor.ref, checked: false }));
             setCheckedStatuseList(statuseData);
             setCheckedDirectionsList(directionsData);
             setCheckedExecutorList(executorData);
         }
-    }, [directionsList, statuseList, usersList]);
+    }, [directionsListFB, statuseList, usersList]);
 
     const open = Boolean(anchorEl);
     const handleClickButton = () => {
@@ -199,7 +202,7 @@ const HeaderFilter: FunctionComponent = () => {
                             )
                         })}
                         <BoldTextLeft>Направление</BoldTextLeft>
-                        {directionsList.length > 0 && directionsList.map((directions: IFilterInterface, i) => {
+                        {directionsListFB.length > 0 && directionsListFB.map((directions: IFilterInterface, i: number) => {
                             return (
                                 <MenuItemNew disableRipple key={i}>
                                     <Checkbox

@@ -60,7 +60,8 @@ export const FieldCreateFireBase: FunctionComponent<IFieldCreateNew> = ({ arrayF
                         <HeaderButtonActive
                             variant="contained"
                             size="small"
-                            type='submit'
+                            type={'submit'}
+                            disabled={item.isLoading}
                         >
                             {item.buttonText}
                         </HeaderButtonActive>

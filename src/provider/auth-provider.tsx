@@ -23,7 +23,7 @@ export const AuthProvider = ({ children }: any) => {
                         email: user1.email,
                         _id: user1.uid,
                         displayName: '',
-                        avatar: '',
+                        photoURL: '',
                         createdAt: new Date().toISOString(),
                         tasks: [],
                         projects: [],

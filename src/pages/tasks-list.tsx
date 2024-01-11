@@ -10,6 +10,7 @@ import { NavLink } from "react-router-dom";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { OverflowDiv } from "../constants/constant-mui";
 import { useAppSelector } from "../hooks/hooks";
+import { useDirections } from "../hooks/use-direction";
 // import { fetchTasksServer, fetchTodos } from "../servises/slices/task-slice";
 
 export const ItemMain = styled(Paper)(({ theme }) => ({
@@ -52,6 +53,7 @@ const LeftPaddingPNumber = styled('p')(({ theme }) => ({
 }));
 
 export const HeaderList: FunctionComponent = () => {
+
     return (
         <Grid justifyContent="center" >
             <Grid xs={12} >
@@ -75,15 +77,19 @@ export const HeaderList: FunctionComponent = () => {
 }
 
 const DataItemsList = () => {
+    const { directionsListFB } = useDirections();
     const { data = [], isFetching, isError, isLoading } = useGetAllListQuery("list");
     const { statusListData, directionsListData, executorsListData } = useAppSelector(state => state.filterData);
 
-    if (isError) return <div>An error has occurred!</div>;
-    if (isLoading) return <div>Loading</div>;
-    if (isFetching) return <div>Fetching</div>;
+
+    // if (isError) return <div>An error has occurred!</div>;
+    // if (isLoading) return <div>Loading</div>;
+    // if (isFetching) return <div>Fetching</div>;
+
+
 
     const items = data && data.filter((item: ITasksItems) => {
-        if (statusListData.length === 0 && directionsListData.length === 0 && executorsListData.length === 0) {
+        if (statusListData.length === 0 && directionsListFB.length === 0 && executorsListData.length === 0) {
             return item;
         } else if (statusListData.length > 0
             && item.taskStatus
@@ -93,6 +99,10 @@ const DataItemsList = () => {
             && item.currentUser
             && item.currentUser !== null
             && executorsListData.findIndex((elem: string) => elem === item.currentUser!.name!) > -1
+            || directionsListData.length > 0
+            && item.currentUser
+            && item.currentUser !== null
+            && directionsListData.findIndex((elem: string) => elem === item.currentUser!.name!) > -1
         ) {
             return item;
         }

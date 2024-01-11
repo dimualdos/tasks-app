@@ -1,36 +1,98 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useAuth } from "./hooks";
 import { doc, updateDoc } from "firebase/firestore";
-import { db } from "../utils/fire-base";
+import { auth, db, getStorageFirebase } from "../utils/fire-base";
+import { updateProfile } from "firebase/auth";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 
 
-export const useUpdateProfile = (name:string, docId: string) => {
+export const useUpdateProfileUsers = () => {
     const { userBaseData } = useAuth();
+    const user = auth.currentUser;
 
-    const [isLoading, setIsLoading] = useState(false);
-    const [isSucces, setIsSuccess] = useState(false);
+    const [isLoadingProfile, setIsLoadingProfile] = useState(false);
+    const [isLoadingPhotoProfile, setIsLoadingPhotoProfile] = useState(false);
+    
+    const [isSuccesProfile, setIsSuccessProfile] = useState(false);
+    const [errorState, setErrorState] = useState<unknown | null>(null);
 
-    const updateProfileUser = async () => {
+    const docRef1 = doc(db, "users", `${user?.uid}`);
+
+    const updateNameProfileUser = async (name: string) => {
+    // const docRef = doc(db, "users", userBaseData!.uid);
         
 
-        setIsLoading(true);
+        setIsLoadingProfile(true);
         try {
-            if(!userBaseData) return;
-            const docRef = doc(db, "users", docId);
-            await updateDoc(docRef, {
+            if(!userBaseData || !user) return;
+            await updateDoc(docRef1, {
                 displayName: name
             });
-            setIsSuccess(true);
+            await updateProfile(user, {
+                displayName: name
+            });
+            setIsSuccessProfile(true);
+
            setTimeout(() => {
-           setIsLoading(false)}, 3000);
+           setIsLoadingProfile(false)}, 3000);
 
         } catch (error) {
             alert(error);
+            setIsLoadingProfile(false);
+            setIsSuccessProfile(false);
         } finally {
-            setIsLoading(false);
+            setTimeout(() => {
+                setIsLoadingProfile(false);
+                setIsSuccessProfile(false);
+            }, 3000);
+
         }
 
     }
-return {isLoading, updateProfileUser, isSucces}
+
+    const updatePhotoProfileUser = async (fileImage: any ) => {
+        if (!user || !fileImage || !auth) return;
+        try {
+            setIsLoadingPhotoProfile(true)
+            // 2 - Upload the image to Cloud Storage.
+            const filePath = `${auth.currentUser!.uid}/${fileImage.current.files[0].name}`;
+            //const filePath = `${auth.currentUser!.uid}/${filePhoto.name}`;
+
+            const newImageRef = ref(getStorageFirebase, filePath);
+            const fileSnapshot = await uploadBytes(newImageRef, fileImage.current.files[0]);
+            // 3 - Generate a public URL for the file
+            const publicImageUrl = await getDownloadURL(newImageRef);
+            // 4 - Update the photo placeholder with the image's URL.
+            await updateProfile(user, {
+                photoURL: publicImageUrl
+            })
+            await updateDoc(docRef1, {
+                photoURL: publicImageUrl,
+                storageUri: fileSnapshot.metadata.fullPath
+            });
+            setIsSuccessProfile(true);
+
+            setTimeout(() => {
+                setIsLoadingPhotoProfile(false);
+            }, 5000)
+        } catch (error) {
+            setErrorState(error);
+            setIsLoadingPhotoProfile(false);
+        } finally {
+           setTimeout(() => {
+            setIsSuccessProfile(false);
+
+                setIsLoadingPhotoProfile(false);
+                setErrorState(null);
+            }, 5000)
+        }
+    }
+    const valueUser = useMemo(() => ({
+        isLoadingProfile, isLoadingPhotoProfile, updateNameProfileUser, isSuccesProfile, errorState, updatePhotoProfileUser
+    }), [errorState, isLoadingPhotoProfile, isLoadingProfile, isSuccesProfile]);
+
+
+return valueUser;
 }
+

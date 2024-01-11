@@ -47,7 +47,7 @@ export interface IOnChangeEvent {
 export interface IChecked {
     name: string,
     checked: boolean,
-    id: string,
+    id: string| number,
 }
 
 export interface ILocationState {
@@ -82,6 +82,7 @@ export interface IProfile {
     user?: any;
     email?: string;
     photoURL?: string;
+    jobTitle?: string;
 }
 export interface IFieldObj {
     h2Data: string;
@@ -95,6 +96,7 @@ export interface IFieldObj {
     removeField: any;
     buttonText: string;
     name?: string[];
+    isLoading?: boolean;
 }
 export interface IFieldCreateNew {
     arrayField: IFieldObj[]
@@ -109,5 +111,10 @@ export interface IInputAdorments {
     typeInput?: string,
     nameInput?: string,
     ariaLabelInput?: string,
+}
+
+export interface IDirectionsLists7 {
+    name: string,
+    profile: 'string',
 }
 

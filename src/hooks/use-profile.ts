@@ -6,15 +6,15 @@ import { IProfile } from "../utils/types";
 
 
 export const useProfile = (  ) => {
- const userData = useAuth();
+ const {userBaseData} = useAuth();
 
 const [isProfileLoading, setIsProfileLoading] = useState(true)
 const [profile, setProfile] = useState<IProfile >({} as IProfile);
 const [name, setName] = useState('');
 useEffect(() => {
-if(!userData.userBaseData) {return};
+if(!userBaseData) {return};
 
- const q = query(collection(db, "users"), where('_id', "==", userData!.userBaseData.uid), limit(1));
+ const q = query(collection(db, "users"), where('_id', "==", userBaseData.uid), limit(1));
 
 onSnapshot(q, snapshot => {
      const dataProfile = snapshot.docs.map(d => ({
@@ -24,7 +24,7 @@ onSnapshot(q, snapshot => {
     setProfile(dataProfile)
     setIsProfileLoading(false)
     setName('')
-})}, [userData.userBaseData]);
+})}, [userBaseData]);
 const valueUser = useMemo(() => ({
     profile, isProfileLoading, name, setName
 }), [isProfileLoading, name, profile]);

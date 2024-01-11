@@ -1,36 +1,37 @@
-import { BoardTasks, TasksList, AddTask, LoginPage, AdminPage, ProfileUser } from "../../pages";
+import { BoardTasks, TasksList, AddTask, LoginPage, ProfileUser } from "../../pages";
 import { ProtectedRoute } from "../../protected/protected-route";
 import { TasksDetail } from "../tasks-detail/tasks-detail";
+import { leftDrawerLinks } from "./left-drawer-links";
+import { LeftDrawer } from '../left-drawer/left-drawer';
 
-export const pageLists = [
-    {
-        path: '/',
-        element: <ProtectedRoute path="/"><AdminPage /></ProtectedRoute>,
-    },
-
+export const linkLists = [
     {
         path: 'board-tasks/*',
-        element: <ProtectedRoute path="board-tasks"><BoardTasks /></ProtectedRoute>,
+        element: <ProtectedRoute ><BoardTasks /></ProtectedRoute>,
     },
-
     {
         path: 'list-tasks/*',
-        element: <ProtectedRoute path="list-tasks"><TasksList /></ProtectedRoute>,
+        element: <ProtectedRoute ><TasksList /></ProtectedRoute>,
     },
     {
         path: 'add-task/*',
-        element: <ProtectedRoute path="add-task"><AddTask /></ProtectedRoute>,
+        element: <ProtectedRoute ><AddTask /></ProtectedRoute>,
     },
     {
-        path: '/tasks-number/:id/*',
-        element: <ProtectedRoute path="/tasks-number/:id"><TasksDetail /></ProtectedRoute>,
+        path: 'tasks-number/:id/*',
+        element: <ProtectedRoute ><TasksDetail /></ProtectedRoute>,
     },
     {
         path: 'login/*',
-        element: <ProtectedRoute path="/login" onlyUnAuth={true}><LoginPage /></ProtectedRoute>,
+        element: <ProtectedRoute onlyUnAuth={true}><LoginPage /></ProtectedRoute>,
     },
     {
         path: 'profile/*',
-        element: <ProtectedRoute path="profile"><ProfileUser /></ProtectedRoute>,
+        element: <ProtectedRoute ><ProfileUser /></ProtectedRoute>,
+    },
+    {
+        path: 'user-panel/*',
+        element: <LeftDrawer />,
+        children: leftDrawerLinks.map(item => item),
     }
 ]

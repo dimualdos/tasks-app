@@ -1,6 +1,6 @@
-import { Box, Button, Checkbox,  Paper,  styled } from "@mui/material";
+import { Box, Button, Checkbox,  Paper,  TableCell,  styled } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import { Link } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import styles from '@emotion/styled';
 import { IOnChangeEvent } from "../utils/types";
 
@@ -113,6 +113,12 @@ export const StyledLink = styled(Link)(({ theme }) => ({
     color: 'inherit',
     textDecoration: 'none',
 }));
+export const StyledLinkDrawer = styled(NavLink)(({ theme }) => ({
+    color: 'inherit',
+    textDecoration: 'none',
+   }));
+
+
 export const StyledBoxOverlay = styled(Box)(({ theme }) => ({
     backgroundColor: theme.palette.mode === "dark" ? theme.palette.primary.light : theme.palette.primary.main,
     flexDirection: "column",
@@ -130,6 +136,8 @@ export const StyledBoxOverlay = styled(Box)(({ theme }) => ({
     transform: "translate(-50%, -50%)",
     borderRadius: "6px",
     padding: "6px 6px",
+    border: "1px solid #666869",
+    boxShadow: "0px 0px 20px rgba(5, 130, 161, 0.75)",
 }));
 
 export const headerLinkModal = styles.div`
@@ -143,11 +151,18 @@ export const headerLinkModal = styles.div`
 export const TextTheme = styled('p')(({ theme }) => ({
     color: theme.palette.mode === "dark" ? theme.palette.primary.contrastText : theme.palette.primary.main,
    }));
-   export const H1Theme = styled('h1')(({ theme }) => ({
+   export const H2Theme = styled('h2')(({ theme }) => ({
     color: theme.palette.mode === "dark" ? theme.palette.primary.contrastText : theme.palette.primary.main,
    }));
    export const H3Theme = styled('h3')(({ theme }) => ({
     color: theme.palette.mode === "dark" ? theme.palette.primary.contrastText : theme.palette.primary.main,
    }));
+
+   export const TableCellTheme = styled(TableCell)(({ theme }) => ({
+    // backgroundColor: theme.palette.mode === "dark" ? theme.palette.background.paper : theme.palette.background.paper,
+    
+    borderBottom: theme.palette.mode === "dark" ? `1px solid ${theme.palette.divider}` : `1px solid ${theme.palette.background.default}`,
+   }));
+
 
 

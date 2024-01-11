@@ -1,17 +1,13 @@
 import React, { FC, ChangeEvent, useRef } from "react";
 import { FieldCreateFireBase } from "../components/field-create/field-create-firebase";
-import { auth, db, getStorageFirebase } from "../utils/fire-base";
+import { auth } from "../utils/fire-base";
 import { IOnChangeEvent } from "../utils/types";
 import { Avatar, Box, styled } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import { doc, updateDoc, } from "firebase/firestore";
-import { H1Theme, H3Theme, HeaderButton, HeaderButtonActive, ItemGrid, ItemTaskOverflow } from "../constants/constant-mui";
+import { H2Theme, H3Theme, HeaderButton, HeaderButtonActive, ItemGrid, ItemTaskOverflow } from "../constants/constant-mui";
 import { useState } from "react";
-import { updateEmail, updateProfile } from "firebase/auth";
-import { useUpdateEmail } from 'react-firebase-hooks/auth';
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { useAuth } from "../hooks/hooks";
 import { useProfile } from "../hooks/use-profile";
+import { useUpdateProfileUsers } from "../hooks/use-profile-update";
 
 const InputElement = styled('input')(
     ({ theme }) => `
@@ -24,19 +20,13 @@ const InputElement = styled('input')(
 
 export const ProfileUser: FC = () => {
     const user = auth.currentUser;
-    // const userData = useAuth();
-    // const user = userData.userBaseData;
     const { profile } = useProfile();
-
-    const [updateEmail, updating, error] = useUpdateEmail(auth);
-    const [email, setEmail] = useState("");
+    // const [email, setEmail] = useState("");
     const [name, setName] = useState("");
-    const [password, setPassword] = useState("");
+    // const [password, setPassword] = useState("");
     const [filePhoto, setFilePhoto] = useState<any>();
     const fileInput = useRef<any>(null);
-    const [isLoading, setIsLoading] = useState(false);
-    const docRef = doc(db, "users", `${user?.uid}`);
-    const [errorState, setErrorState] = useState<unknown | null>(null);
+    const { isLoadingProfile, updateNameProfileUser, isSuccesProfile, isLoadingPhotoProfile, errorState, updatePhotoProfileUser } = useUpdateProfileUsers();
 
 
     const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
@@ -45,84 +35,32 @@ export const ProfileUser: FC = () => {
         }
     };
 
-    if (error) {
-        return (
-            <div>
-                <p>Error: {error.message}</p>
-            </div>
-        );
-    }
-    if (updating) {
-        return <p>Updating...</p>;
-    }
-
     const updatePhotoUser = async (event: { preventDefault: () => void; }) => {
         event.preventDefault();
         if (!user || !filePhoto || !auth) return;
-        try {
-            setIsLoading(true)
-            // 2 - Upload the image to Cloud Storage.
-            const filePath = `${auth.currentUser!.uid}/${fileInput.current.files[0].name}`;
-            //const filePath = `${auth.currentUser!.uid}/${filePhoto.name}`;
-
-            const newImageRef = ref(getStorageFirebase, filePath);
-            const fileSnapshot = await uploadBytesResumable(newImageRef, fileInput.current.files[0]);
-            // 3 - Generate a public URL for the file
-            const publicImageUrl = await getDownloadURL(newImageRef);
-            // 4 - Update the photo placeholder with the image's URL.
-            await updateProfile(user, {
-                photoURL: publicImageUrl
-            })
-            await updateDoc(docRef, {
-                photoURL: publicImageUrl,
-                storageUri: fileSnapshot.metadata.fullPath
-            });
-            setTimeout(() => {
-                removeFildePhoto();
-                setIsLoading(false);
-            }, 500)
-        } catch (error) {
-            setErrorState(error);
-        } finally {
-            removeFildePhoto();
-            setIsLoading(false);
-            setTimeout(() => {
-                setErrorState(null);
-            }, 5000)
-        }
+        updatePhotoProfileUser(fileInput)
+        removeFildePhoto();
     }
 
     const updateNameUser = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         if (!user || !name.trim().length) return;
-        try {
-
-            await updateDoc(docRef, {
-                displayName: name
-            });
-
-            await updateProfile(user, {
-                displayName: name
-            })
-
-        } catch (error) {
-            alert(error);
-        } finally {
+        updateNameProfileUser(name);
+        setTimeout(() => {
             removeFieldUser();
-        }
-
+        }, 3000)
     };
 
-    const updateEmailUser = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        if (!user || !email.trim().length) return;
-        const success = await updateEmail(email);
-        if (success) {
-            alert('Updated email address');
-        }
-        removeFieldUser();
+    // const updateEmailUser = async (event: React.FormEvent<HTMLFormElement>) => {
+    //     event.preventDefault();
+    //     if (!user || !email.trim().length) return;
+    //     const success = await updateEmail(email);
+    //     if (success) {
+    //         alert('Updated email address');
+    //     }
+    //     removeFieldUser();
 
-    };
+    // };
     // const updatePasswordUser = async (event: React.FormEvent<HTMLFormElement>) => {
     //     event.preventDefault();
     //     if (!user) return;
@@ -138,8 +76,8 @@ export const ProfileUser: FC = () => {
 
     const removeFieldUser = () => {
         setName('');
-        setEmail('');
-        setPassword('');
+        // setEmail('');
+        // setPassword('');
     }
     const removeFildePhoto = () => {
         setFilePhoto(null);
@@ -162,22 +100,24 @@ export const ProfileUser: FC = () => {
             }],
             removeField: removeFieldUser,
             buttonText: "Изменить имя",
+            isLoading: isLoadingProfile,
         },
-        {
-            h2Data: "Изменить почту",
-            onSubmit: updateEmailUser,
-            idForm: 'id-email',
-            label: ["Введите почту"],
-            type: ["email"],
-            valueMass: [email],
-            idTextField: ["email"],
-            name: ["email"],
-            onChange: [(event: IOnChangeEvent) => {
-                setEmail(event.target.value);
-            }],
-            removeField: removeFieldUser,
-            buttonText: "Изменить почту",
-        },
+        // {
+        //     h2Data: "Изменить почту",
+        //     onSubmit: updateEmailUser,
+        //     idForm: 'id-email',
+        //     label: ["Введите почту"],
+        //     type: ["email"],
+        //     valueMass: [email],
+        //     idTextField: ["email"],
+        //     name: ["email"],
+        //     onChange: [(event: IOnChangeEvent) => {
+        //         setEmail(event.target.value);
+        //     }],
+        //     removeField: removeFieldUser,
+        //     buttonText: "Изменить почту",
+        //     isLoading: isLoadingProfile,
+        // },
         // {
         //     h2Data: "Изменить пароль",
         //     onSubmit: updatePasswordUser,
@@ -197,11 +137,11 @@ export const ProfileUser: FC = () => {
 
     return (
         <ItemTaskOverflow>
-            {/* {isLoading ? <p>Loading...</p> : null} */}
-            {/* {isSucces ? <p>Изменения сохранены!</p> : null} */}
+            {/* {isLoading ? <p>Loading...</p> : null}
+            {isSucces ? <p>Изменения сохранены!</p> : null} */}
             {profile! && profile._id ? (
                 <Grid container display={"flex"} flexDirection={"column"} alignItems="center" xs={12}>
-
+                    <H2Theme>Ваш профиль</H2Theme>
                     <Grid sx={{ display: 'flex', flexDirection: 'row', gap: '20px', alignItems: 'center', justifyContent: 'center' }} xs={12}>
                         <Box sx={{ gap: '5px', display: 'flex', alignItems: 'center' }}>
                             <Avatar alt="фото пользователя" src={profile.photoURL} />
@@ -209,8 +149,17 @@ export const ProfileUser: FC = () => {
                         </Box>
                         <H3Theme>Почта: {profile ? profile.email : 'нет почты'}</H3Theme>
                     </Grid>
+                    <Box sx={{
+                        color: (theme) =>
+                            theme.palette.mode === "dark" ?
+                                theme.palette.primary.contrastText :
+                                theme.palette.primary.main,
+                        mb: '20px'
+                    }}>
+                        {isSuccesProfile ? 'Данные обновлены' : 'Вы можете изменить имя или обновть фото'}
+                    </Box>
 
-                    <H1Theme>Ваш профиль</H1Theme>
+
                     <Grid sx={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center', justifyContent: 'center' }} xs={12}>
                         {/* обновление данных профиля */}
                         <FieldCreateFireBase arrayField={arrayField} />
@@ -238,13 +187,12 @@ export const ProfileUser: FC = () => {
                                     <HeaderButton
                                         variant="contained"
                                         size="small"
-                                        type="button"
+                                        type="reset"
                                         onClick={removeFildePhoto}
                                     >
                                         Очистить поле
                                     </HeaderButton>
-                                    {isLoading ? <HeaderButtonActive >Идет отправка</HeaderButtonActive>
-                                        : <HeaderButtonActive type="submit">Обновить фото</HeaderButtonActive>}
+                                    <HeaderButtonActive disabled={isLoadingPhotoProfile} type="submit">{isLoadingPhotoProfile ? 'Идет отправка' : 'Обновить фото'}</HeaderButtonActive>
                                 </Box>
                                 {errorState ? <p>{`${errorState}`}</p> : null}
                             </form>
@@ -254,8 +202,6 @@ export const ProfileUser: FC = () => {
             ) : null}
 
         </ItemTaskOverflow>
-
-
     );
 }
 

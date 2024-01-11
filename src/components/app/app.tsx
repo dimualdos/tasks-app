@@ -10,18 +10,18 @@ import { joinChat } from '../../servises/actions/user-actions';
 import { getDesignTokens } from './getDesignTokens';
 import { fetchDirectionServer, fetchStatuseServer, fetchUsers } from '../../servises/slices/task-slice';
 import { ColorModeContext } from '../../servises/context';
-import { styled } from "@mui/material";
-import { pageLists } from './array-lists';
+import { linkLists } from './array-lists';
 import { AuthProvider } from '../../provider/auth-provider';
 
 import './app.css';
+
 
 const router = createBrowserRouter([
   {
     path: "/",
     errorElement: <ErrorPage />,
     element: < NavbarMain />,
-    children: pageLists.map(item => item),
+    children: linkLists.map(item => item),
   },
 ]);
 
@@ -53,9 +53,9 @@ function App() {
     childElemenet!.classList.add(theme.palette.mode === "dark" ? 'darkTheme' : 'lightTheme')
     // получение списков с сервера
     // dispatch(getItemsTasks());
-    dispatch(fetchDirectionServer());
-    dispatch(fetchStatuseServer());
-    dispatch(fetchUsers());
+    // dispatch(fetchDirectionServer());
+    // dispatch(fetchStatuseServer());
+    // dispatch(fetchUsers());
     dispatch(joinChat());
     return () => {
       childElemenet!.classList.remove(theme.palette.mode === "dark" ? 'darkTheme' : 'lightTheme');
