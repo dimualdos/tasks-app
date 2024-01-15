@@ -55,6 +55,8 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
     color: 'inherit',
     '& .MuiInputBase-input': {
+        color: 'black',
+
         padding: theme.spacing(1, 1, 1, 0),
         // vertical padding + font size from searchIcon
         paddingLeft: `calc(1em + ${theme.spacing(4)})`,
@@ -205,11 +207,11 @@ function Header() {
                         <CustomizedSwitches />
                     </Box>
                     {/* пользователь приложения  */}
-                    {user && profile.photoURL ? (
+                    {user ? (
                         <Box sx={{ flexGrow: 0 }}>
                             <Tooltip title="Open settings">
                                 <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                    {profile.photoURL && <Avatar alt="name" src={profile.photoURL} />}
+                                    {profile && profile.photoURL && <Avatar alt="name" src={profile.photoURL} />}
                                 </IconButton>
                             </Tooltip>
 

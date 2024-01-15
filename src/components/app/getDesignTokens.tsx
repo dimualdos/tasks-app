@@ -24,8 +24,8 @@ export const getDesignTokens = (mode: PaletteMode) => ({
                 },
                 text: {
                     primary: "#011E2A",
-                    secondary: "#E1E1E1",
-                    hint: "#21194c",
+                    secondary: "#808080",
+                    // hint: "#21194c",
                 },
                 divider: "#666869",
             }
@@ -108,8 +108,8 @@ export const getDesignTokens = (mode: PaletteMode) => ({
                 },
             },
         },
-        MuiInput: {
-            color: "var(--TextField-brandBorderHoverColor)",
+        MuiInputBase: {
+            textColor: "var(--TextField-brandBorderHoverColor)",
             styleOverrides: {
                 root: {
                     "&:before": {
@@ -124,6 +124,15 @@ export const getDesignTokens = (mode: PaletteMode) => ({
                     height: "100%"
                 },
             },
+            variants: [
+                {
+                    props: { type: "checkbox" },
+                    style: {
+                        border: '1px solid black'
+                    },
+                },
+
+            ],
         },
         MuiInputLabel: {
             styleOverrides: {

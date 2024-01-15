@@ -8,11 +8,11 @@ export const useUsersList = () => {
     const { userBaseData } = useAuth();
 
     const [usersListFB, setUsersListFB] = useState<any>()
+    const q = query(collection(db, "users"));
 
 
     useEffect(() => {
         if (!userBaseData) { return };
-        const q = query(collection(db, "users"));
 
         onSnapshot(q, snapshot => {
             const dataDirection = snapshot.docs.map(d => ({
@@ -20,10 +20,10 @@ export const useUsersList = () => {
 
             }));
             setUsersListFB(dataDirection)
-            // setIsProfileLoading(false)
-            // setName('')
+
         })
     }, [userBaseData]);
+
     const valueUsersList = useMemo(() => ({
         usersListFB
     }), [usersListFB]);

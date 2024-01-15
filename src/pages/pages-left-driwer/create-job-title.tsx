@@ -1,64 +1,65 @@
 import { useState } from "react";
 import { IOnChangeEvent } from "../../utils/types";
 import { FieldCreateFireBase } from "../../components/field-create/field-create-firebase";
-import { useDirections } from "../../hooks/use-direction";
 import { ItemGrid, SenterBox } from "../../constants/constant-mui";
+import { useJobTitle } from "../../hooks/use-job-title";
 import { Box, List, ListItem } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
 
-export const CreateDirections = () => {
 
 
-    const [direction, setDirection] = useState("");
-    const { addDirection, directionsListFB, deleteDirection } = useDirections()
-    // if (directionsListFB) console.log(directionsListFB)
+export const CreateJobTitle = () => {
+    const { updateJobUsersList, dataJobTitle, deleteJobTitle } = useJobTitle()
+    const [job, setJob] = useState("");
+    const [errorState, setErrorState] = useState<unknown | null>(null);
+
     const handleSubmitDirection = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        addDirection(direction);
+        updateJobUsersList(job);
         removeFieldDirection();
-    }
-    const removeFieldDirection = () => {
-        setDirection("");
     };
-    const handleDeleteDirection = (id: string) => {
-        console.log('click')
-        deleteDirection(id)
+    const removeFieldDirection = () => {
+        setJob("");
+    };
+    const handleDeleteJobTitle = (id: string) => {
+        deleteJobTitle(id)
     }
+
     const arrayField = [
         {
-            h2Data: "Создать направление",
+            h2Data: "Создать должность",
             onSubmit: handleSubmitDirection,
             idForm: "outlined-direction-form",
-            label: ["Введите направление"],
-            valueMass: [direction],
+            label: ["Введите должность"],
+            valueMass: [job],
             type: ["text"],
             idTextField: ["outlined-direction"],
-            name: ['direction'],
+            name: ['job'],
             onChange: [(event: IOnChangeEvent) => {
-                setDirection(event.target.value);
+                setJob(event.target.value);
             }],
             removeField: removeFieldDirection,
-            buttonText: "Создать направление",
-        }]
+            buttonText: "Создать должность",
+        },
+    ]
 
     return (
         <>
             <FieldCreateFireBase arrayField={arrayField} />
+
             <ItemGrid xl={6} md={6} sm={12} sx={{
                 gap: "10px", padding: '20px'
             }}>
-                <SenterBox><h2>Список направлений</h2></SenterBox>
-                <List >
-                    {directionsListFB && directionsListFB.map((item: { name: string, _id: string },
-                        i: number) =>
+                <SenterBox><h2>Список должностей</h2></SenterBox>
+                <List>
+                    {dataJobTitle && dataJobTitle.map((item: { name: string, _id: string }, i: number) =>
                         <Box key={i} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                             <ListItem >{item.name}</ListItem>
-                            <DeleteIcon sx={{ color: '#0582a1' }} fontSize='small' onClick={() => handleDeleteDirection(item._id)} />
+                            <DeleteIcon sx={{ color: '#0582a1' }} fontSize='small' onClick={() => handleDeleteJobTitle(item._id)} />
                         </Box>
                     )}
                 </List>
-            </ItemGrid>
+            </ItemGrid >
         </>
-
     )
 }

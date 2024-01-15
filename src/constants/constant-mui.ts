@@ -2,7 +2,6 @@ import { Box, Button, Checkbox,  Paper,  TableCell,  styled } from "@mui/materia
 import Grid from "@mui/material/Unstable_Grid2";
 import { Link, NavLink } from "react-router-dom";
 import styles from '@emotion/styled';
-import { IOnChangeEvent } from "../utils/types";
 
 
 export const ItemGrid = styled(Grid)(({ theme }) => ({

@@ -75,17 +75,16 @@ export const useUpdateProfileUsers = () => {
 
             setTimeout(() => {
                 setIsLoadingPhotoProfile(false);
-            }, 5000)
+            }, 3000)
         } catch (error) {
             setErrorState(error);
             setIsLoadingPhotoProfile(false);
         } finally {
            setTimeout(() => {
-            setIsSuccessProfile(false);
-
+                setIsSuccessProfile(false);
                 setIsLoadingPhotoProfile(false);
                 setErrorState(null);
-            }, 5000)
+            }, 3000)
         }
     }
     const valueUser = useMemo(() => ({

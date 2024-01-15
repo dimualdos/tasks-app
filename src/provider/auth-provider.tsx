@@ -1,7 +1,6 @@
-import { FC, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { User } from "@firebase/auth";
 import { auth, db, logout, register, loginFireBase } from "../utils/fire-base";
-import { addDoc, collection } from "@firebase/firestore";
 import { AuthContext } from "../servises/context";
 import { doc, setDoc } from "firebase/firestore";
 
@@ -10,7 +9,7 @@ export const AuthProvider = ({ children }: any) => {
     const [userBaseData, setUserBaseData] = useState<User | null>(null);
     const [isLoadingInitial, setIsLoadingInitial] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
-    // console.log(userBaseData)
+
     const registerHandler = async (email: string, password: string) => {
         setIsLoading(true);
         // setError('');

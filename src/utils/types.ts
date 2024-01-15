@@ -83,11 +83,12 @@ export interface IProfile {
     email?: string;
     photoURL?: string;
     jobTitle?: string;
+    changes?: string;
 }
 export interface IFieldObj {
     h2Data: string;
     idForm: string;
-    onSubmit: { (event: React.FormEvent<HTMLFormElement>): Promise<void> };
+    onSubmit: { (event: React.FormEvent<HTMLFormElement>): any };
     label?: string[];
     valueMass?: string[];
     type: string[];
