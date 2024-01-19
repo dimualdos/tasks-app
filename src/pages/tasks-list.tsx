@@ -78,6 +78,7 @@ export const HeaderList: FunctionComponent = () => {
 
 const DataItemsList = () => {
     const { directionsListFB } = useDirections();
+
     const { data = [], isFetching, isError, isLoading } = useGetAllListQuery("list");
     const { statusListData, directionsListData, executorsListData } = useAppSelector(state => state.filterData);
 

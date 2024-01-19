@@ -103,7 +103,12 @@ export const ItemTaskOverflow = styled("div")(({ theme }) => ({
     maxHeight: `85vh`,
     overflowY: "auto",
     overflowX: "hidden",
-}))
+}));
+
+export const DivOverflow = styled( ItemTaskOverflow ) (({ theme }) => ({
+       maxHeight: "45vh",  
+}));
+
 export const OverflowFilter = styled(ItemTaskOverflow)(({ theme }) => ({
     maxHeight: "75vh",
     marginRight: "10px",
@@ -120,17 +125,10 @@ export const StyledLinkDrawer = styled(NavLink)(({ theme }) => ({
 
 export const StyledBoxOverlay = styled(Box)(({ theme }) => ({
     backgroundColor: theme.palette.mode === "dark" ? theme.palette.primary.light : theme.palette.primary.main,
-    flexDirection: "column",
-    display: "flex",
-    flexWrap: "wrap",
     boxSizing: "border-box",
-    maxWidth: "720px",
-    maxHeight: "80vh",
     zIndex: "15",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "fixed",
-    top: "47%",
+    position: "absolute",
+    top: "50%",
     left: "50%",
     transform: "translate(-50%, -50%)",
     borderRadius: "6px",

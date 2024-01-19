@@ -14,7 +14,7 @@ export const useJobTitle = (idUser?: string | null) => {
 
     useEffect(() => {
         if (!userBaseData) { return };
-        onSnapshot(q, snapshot => {
+        const unsubscribe = onSnapshot(q, snapshot => {
             const dataJobTitle = snapshot.docs.map(d => ({
                 ...(d.data() as any),
                 _id: d.id,
@@ -22,7 +22,9 @@ export const useJobTitle = (idUser?: string | null) => {
             }));
             setDataJobTitle(dataJobTitle);
 
-        })
+        });
+        return () => unsubscribe();
+
     }, [userBaseData]);
 
     const updateJobUser = async (jobUser: string) => {

@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { IOnChangeEvent } from "../../utils/types";
 import { FieldCreateFireBase } from "../../components/field-create/field-create-firebase";
-import { ItemGrid, SenterBox } from "../../constants/constant-mui";
+import { DivOverflow, ItemGrid, SenterBox } from "../../constants/constant-mui";
 import { useJobTitle } from "../../hooks/use-job-title";
 import { Box, List, ListItem } from "@mui/material";
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -50,15 +50,17 @@ export const CreateJobTitle = () => {
             <ItemGrid xl={6} md={6} sm={12} sx={{
                 gap: "10px", padding: '20px'
             }}>
-                <SenterBox><h2>Список должностей</h2></SenterBox>
-                <List>
-                    {dataJobTitle && dataJobTitle.map((item: { name: string, _id: string }, i: number) =>
-                        <Box key={i} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                            <ListItem >{item.name}</ListItem>
-                            <DeleteIcon sx={{ color: '#0582a1' }} fontSize='small' onClick={() => handleDeleteJobTitle(item._id)} />
-                        </Box>
-                    )}
-                </List>
+                <DivOverflow>
+                    <SenterBox><h2>Список должностей</h2></SenterBox>
+                    <List>
+                        {dataJobTitle && dataJobTitle.map((item: { name: string, _id: string }, i: number) =>
+                            <Box key={i} sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                                <ListItem >{item.name}</ListItem>
+                                <DeleteIcon sx={{ color: '#0582a1' }} fontSize='small' onClick={() => handleDeleteJobTitle(item._id)} />
+                            </Box>
+                        )}
+                    </List>
+                </DivOverflow>
             </ItemGrid >
         </>
     )

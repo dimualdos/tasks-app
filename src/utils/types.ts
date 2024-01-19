@@ -119,3 +119,13 @@ export interface IDirectionsLists7 {
     profile: 'string',
 }
 
+export interface ITasksUser {
+    whoAddedTheTaskUserId?: string,
+    confirmDoneManager?: string,
+    executorTaskId?: string,
+    number?: number,
+    pendingConfirm?: string,
+    statusEditDoc?: boolean,
+    _id?: string,
+    // nameTasksUser: string,
+}

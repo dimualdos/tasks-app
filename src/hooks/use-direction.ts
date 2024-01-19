@@ -1,4 +1,4 @@
-import { query, collection, where, onSnapshot, addDoc, deleteDoc, doc } from "firebase/firestore";
+import { query, collection,  onSnapshot, addDoc, deleteDoc, doc } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
 import { db } from "../utils/fire-base";
 import { useAuth } from "./hooks";
@@ -16,16 +16,18 @@ export const useDirections = () => {
         if(!userBaseData) {return};
         const q = query(collection(db, "direction"));
       
-        onSnapshot(q, snapshot => {
+      const unsubscribe = onSnapshot(q, snapshot => {
              const dataDirection = snapshot.docs.map(d => ({
-            ...(d.data() as any ),
+            ...(d.data() as {name: string}[] ),
             _id: d.id,
           
           }));
             setDirectionsListFB(dataDirection)
-            // console.log(dataDirection);
          
-        })}, [userBaseData]);
+        });
+   return () => unsubscribe();
+
+    }, [userBaseData]);
         
    
    const addDirection =  (direction: string) => {

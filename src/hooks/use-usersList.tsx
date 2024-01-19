@@ -14,16 +14,18 @@ export const useUsersList = () => {
     useEffect(() => {
         if (!userBaseData) { return };
 
-        onSnapshot(q, snapshot => {
+        const unsubscribe = onSnapshot(q, snapshot => {
             const dataDirection = snapshot.docs.map(d => ({
                 ...(d.data() as any)
 
             }));
             setUsersListFB(dataDirection)
 
-        })
-    }, [userBaseData]);
+        });
+        return () => unsubscribe();
 
+    }, [userBaseData]);
+    // console.log(usersListFB);
     const valueUsersList = useMemo(() => ({
         usersListFB
     }), [usersListFB]);

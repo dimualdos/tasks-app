@@ -6,7 +6,6 @@ import ListItem from '@mui/material/ListItem';
 import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
-import Toolbar from '@mui/material/Toolbar';
 import { leftListPages } from './left-list-pages';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { ItemGrid, ItemTaskOverflow } from '../../constants/constant-mui';
@@ -15,10 +14,6 @@ import styles from './left-drawer.module.css'
 
 
 const drawerWidth = 240;
-
-interface Props {
-    window?: () => Window;
-}
 
 export const LeftDrawer: React.FC = () => {
     let location = useLocation();
@@ -83,13 +78,14 @@ export const LeftDrawer: React.FC = () => {
                 component="main"
                 sx={{ flexGrow: 1, p: 3, width: { sm: `calc(100% - ${drawerWidth}px)` }, justifyContent: 'center' }}
             >
-                <Toolbar />
-                <ItemTaskOverflow>
+                <ItemTaskOverflow >
                     <Grid container display={"flex"} flexDirection={"column"} gap={"20px"} alignItems="center" xs={12}>
+
                         <Outlet />
+
+
                     </Grid>
                 </ItemTaskOverflow>
-
             </Box>
         </Box>
     );

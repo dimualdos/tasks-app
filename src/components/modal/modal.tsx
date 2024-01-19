@@ -1,6 +1,5 @@
 import { useEffect, FC, ReactNode } from 'react';
 import ReactDOM from 'react-dom';
-import CloseIcon from '@mui/icons-material/Close';
 import ModalOverlay from '../modal-overlay/modal-overlay';
 import { StyledBoxOverlay } from '../../constants/constant-mui';
 
@@ -11,9 +10,10 @@ type TModal = {
     children: ReactNode;
     onClose: () => void;
     overlay: boolean;
+    tasksOverlay?: boolean
 };
 
-const Modal: FC<TModal> = ({ onClose, children, overlay = true }) => {
+const Modal: FC<TModal> = ({ onClose, children, overlay = true, tasksOverlay = false }) => {
     useEffect(() => {
         const removeModal = (e: KeyboardEvent) => {
             e.key === 'Escape' && onClose();
@@ -42,11 +42,11 @@ const Modal: FC<TModal> = ({ onClose, children, overlay = true }) => {
                         <CloseIcon type="primary" />
                     </div>
                 </headerLink> */}
-                <div >
-                    {children}
-                </div>
+
+                {children}
+
             </StyledBoxOverlay>
-            {overlay ? (<ModalOverlay onClose={onClose} />) : null}
+            {overlay ? (<ModalOverlay taskOverlay={tasksOverlay} onClose={onClose} />) : null}
         </>, modalItems!
     )
 }

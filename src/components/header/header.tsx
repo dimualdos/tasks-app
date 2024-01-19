@@ -17,13 +17,13 @@ import SearchIcon from '@mui/icons-material/Search';
 import GroupHeaderButtons from './header-button';
 import HeaderFilter from './header-filter';
 import { CustomizedSwitches } from '../tabs-radio/tabs-radio';
-import { Link, useLocation } from 'react-router-dom';
-import { HeaderButtonActive } from '../../constants/constant-mui';
+import { useLocation } from 'react-router-dom';
 import { userDataPath } from './user-links';
 import { StyledLink } from '../../constants/constant-mui';
 import { useAuth } from '../../hooks/hooks';
 import { auth } from '../../utils/fire-base';
 import { useProfile } from '../../hooks/use-profile';
+import { AddTaskApp } from '../../pages';
 
 
 
@@ -151,9 +151,9 @@ function Header() {
                         >
                             {/*  Тут должен быть компонент для отображения задач и фильтрации */}
 
-                            <Link to={'add-task'}>
-                                <HeaderButtonActive size="small" variant="contained">+ Добавить задачу</HeaderButtonActive>
-                            </Link>
+                            <Box >
+                                <AddTaskApp />
+                            </Box>
                             {/* Группа кнопок */}
                             <GroupHeaderButtons />
                             {/* фильтр кнопка */}
@@ -178,11 +178,12 @@ function Header() {
                             LOGO
                         </StyledLink>
                     </Typography>
+
                     {/*  Тут должен быть компонент для отображения задач и фильтрации */}
                     <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-                        <Link to={'add-task'}>
-                            <HeaderButtonActive size="small" variant="contained">+ Добавить задачу</HeaderButtonActive>
-                        </Link>
+                        <Box >
+                            <AddTaskApp />
+                        </Box>
                     </Box>
                     <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
                         <GroupHeaderButtons />
