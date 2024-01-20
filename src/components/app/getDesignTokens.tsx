@@ -25,7 +25,7 @@ export const getDesignTokens = (mode: PaletteMode) => ({
                 text: {
                     primary: "#011E2A",
                     secondary: "#808080",
-                    // hint: "#21194c",
+                    hint: "#21194c",
                 },
                 divider: "#666869",
             }

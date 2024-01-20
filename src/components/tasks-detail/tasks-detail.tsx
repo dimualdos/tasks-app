@@ -10,6 +10,11 @@ import { useGetTasksIdQuery } from "../../servises/rtk-query/tasks-api";
 import Box from "@mui/material/Box";
 import { BoxAvatar } from "../../pages/add-task";
 import { BadgeAvatars } from "../avatar/avatar";
+import { useTaskList } from "../../hooks/use-tasks-list";
+import { useUsersList } from "../../hooks/use-usersList";
+import { useStatus } from "../../hooks/use-status";
+import { useDirections } from "../../hooks/use-direction";
+import Avatar from "@mui/material/Avatar";
 
 
 
@@ -40,41 +45,52 @@ const BoxSelect = styled(Box)(({ theme }) => ({
 
 export const TasksDetail: FunctionComponent = () => {
     let { id } = useParams();
-    // if (id) console.log(id)
-    //const { todos } = useAppSelector((store) => store.tasksArray);
-    const { data = [], isFetching, isError, isLoading } = useGetTasksIdQuery(`${id}`);
+    const { tasksList } = useTaskList();
+    const { usersListFB } = useUsersList();
+    const { statusListFB } = useStatus();
+    const { directionsListFB } = useDirections();
 
     const taskItem = useMemo(() => {
-        if (isError) return <div>An error has occurred!</div>
-        if (isLoading) return <div>Loading</div>
+        const taskID: any = tasksList && tasksList!.find((item: any) => item.number === +`${id}`);
+        if (!taskID) return <div>Loading</div>
+        const customer = usersListFB && usersListFB!.find((item: any) => item._id === taskID.whoAddedTheTaskUserId);
+        const currentUser = usersListFB && usersListFB!.find((item: any) => item._id === taskID.executorTaskId);
+        const taskStatus = statusListFB && statusListFB!.find((item: any) => item._id === taskID.taskStatus);
+        const direction = directionsListFB && directionsListFB!.find((item: any) => item._id === taskID.taskDirection);
+        console.log(currentUser)
         return (
             <Grid xs={8} >
                 <ItemTask >
                     <ItemTask2>
-                        <Box display={"flex"} flexDirection={"row"} justifyContent={"space-between"}>
-                            <Grid display={"flex"} alignItems={"center"} xs={3}><>Задание №{data ? data.fullNumber : null}</></Grid>
-                            <Grid xs={8}><BoxAvatar>Автор <BadgeAvatars data={data ? data.customer.name : "Автора нет"} /></BoxAvatar></Grid>
-                            {/* <h4>Заказчик {data ? data.customer.name : null}, почта: {data ? data.customer.email : null}</h4> */}
+                        <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <Grid display={"flex"} alignItems={"center"} xs={3}><div>Задание № {taskID ? `${taskID.number}` : null}</div></Grid>
+                            <Grid sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }} >
+                                <Grid sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', flexWrap: 'nowrap' }}>
+                                    <BoxAvatar>Автор <Avatar alt="name" src={customer ? customer.photoURL : "Автора нет"} /></BoxAvatar>
+                                    {customer ? customer.displayName : null},
+                                </Grid>
+                                <Box>почта: {customer ? customer.email : null}</Box>
+                            </Grid>
                         </Box >
 
-                        <h1>{data ? data.name : null}</h1>
+                        <h1>{taskID ? taskID.nameTask : null}</h1>
 
                         <Box display={"flex"} flexDirection={"row"} justifyContent={"space-between"}>
-                            <Grid xs={6}><BoxAvatarLeft><BadgeAvatars data={data.currentUser && data.currentUser.name ? data.currentUser.name : "Исполнителя нет"} /></BoxAvatarLeft></Grid>
-                            <Grid xs={3} display={"flex"} alignItems={"center"}><BoxSelect>{data.taskStatus && data.taskStatus.name ? data.taskStatus.name : "статуса нет"}</BoxSelect></Grid>
-                            <Grid xs={3} display={"flex"} alignItems={"center"}><BoxSelect>{data ? data.direction.name : "направления нет"}</BoxSelect></Grid>
+                            <Grid xs={6}><BoxAvatarLeft><Avatar alt="name" src={currentUser ? currentUser.photoURL : "Исполнителя нет"} /><>{currentUser ? currentUser.displayName : "Исполнителя нет"}</></BoxAvatarLeft></Grid>
+                            <Grid xs={3} display={"flex"} alignItems={"center"}><BoxSelect>{taskStatus ? taskStatus.name : "статуса нет"}</BoxSelect></Grid>
+                            <Grid xs={3} display={"flex"} alignItems={"center"}><BoxSelect>{direction ? direction.name : "направления нет"}</BoxSelect></Grid>
                         </Box>
 
                         <hr />
                         {/* описание задачи при помощи dangerouslySetInnerHTML */}
-                        <div>{data ? <Box sx={{ textAlign: "left" }} pl={2} dangerouslySetInnerHTML={{ __html: data.description }}></Box> : null}</div>
+                        <div>{taskID ? <Box sx={{ textAlign: "left" }} pl={2} dangerouslySetInnerHTML={{ __html: taskID.taskDescription }}></Box> : null}</div>
 
                     </ItemTask2>
 
                 </ItemTask>
             </Grid>
         )
-    }, [data, isError, isLoading])
+    }, [directionsListFB, id, statusListFB, tasksList, usersListFB])
 
     return (
         <Grid container xs={12} spacing={2} justifyContent={"center"}>

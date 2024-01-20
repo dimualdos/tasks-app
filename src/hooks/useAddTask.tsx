@@ -29,7 +29,6 @@ export const useTask = () => {
     const [errorStateTask, setErrorStateTask] = useState<unknown | null>(null);
     const [numberTask, setNumberTask] = useState<ITasksUser>();
     const [queryEditDoc, setQueryEditDoc] = useState<any>();
-    const [tasksLis, setTasksList] = useState<any>()
 
     const numberTaskRef = collection(db, "tasksNumber");
 
@@ -41,7 +40,7 @@ export const useTask = () => {
 
         const unsubscribe = onSnapshot(q1, snapshot => {
             const dataNumber = snapshot.docs.map(d => ({
-                ...(d.data() as any),
+                ...(d.data() as ITasksUser),
                 _id: d.id,
             }))[0];
             setNumberTask(dataNumber);
@@ -53,7 +52,7 @@ export const useTask = () => {
 
     useEffect(() => {
         if (!userBaseData) { return };
-        const q = query(collection(db, "tasksNumber"), and(
+        const q = query(numberTaskRef, and(
             where("whoAddedTheTaskUserId", "==", userBaseData.uid),
             and(
                 where("statusEditDoc", "==", false),
@@ -61,7 +60,7 @@ export const useTask = () => {
         ), limit(1));
         const unsubscribeTaskStatus = onSnapshot(q, snapshot => {
             const dataTaskStatus = snapshot.docs.map(d => ({
-                ...(d.data() as any),
+                ...(d.data() as ITasksUser),
                 _id: d.id,
             }));
             setQueryEditDoc(dataTaskStatus);
@@ -69,30 +68,14 @@ export const useTask = () => {
         return () => unsubscribeTaskStatus();
     }, [userBaseData]);
 
-    // получение всего списка задач
-
-    useEffect(() => {
-        if (!userBaseData) { return };
-        const q = query(collection(db, "tasksNumber"));
-        const unsubscribeTaskList = onSnapshot(q, snapshot => {
-            const dataTaskList = snapshot.docs.map(d => ({
-                ...(d.data() as any),
-                _id: d.id,
-            }));
-            setTasksList(dataTaskList);
-        })
-        return () => unsubscribeTaskList();
-    }, [userBaseData]);
-
-    if (tasksLis) {
-        console.log(tasksLis);
-    }
+    // проверка на то есть ли ранее созданная,
+    // но не заплненная конкретным пользователем задача
     const chekedTasks = async () => {
 
         const docRef = collection(db, "tasksNumber");
-        if (queryEditDoc.statusEditDoc === false) {
+        if (queryEditDoc && queryEditDoc.statusEditDoc === false) {
             return
-        } else if (!queryEditDoc.length) {
+        } else if (!queryEditDoc?.length) {
             setIsLoadingTask(true);
             try {
                 await addDoc(docRef, {
@@ -122,9 +105,9 @@ export const useTask = () => {
 
             }
         }
+    };
 
-    }
-
+    // добавление заполненной задачи в модальном окне по кнопке "создать задачу"
     const addNewTask = async (
         nameTasksUser: string,
         numberTasksUser: number,
@@ -170,8 +153,7 @@ export const useTask = () => {
             }, 3000);
 
         }
-    }
-
+    };
 
     const valueTask = useMemo(() => ({
         queryEditDoc,
@@ -181,10 +163,7 @@ export const useTask = () => {
         errorStateTask,
         addNewTask,
         chekedTasks,
-
-
     }), [queryEditDoc, numberTask, errorStateTask, isLoadingTask, isSuccesAddTask]);
-
 
     return valueTask;
 }

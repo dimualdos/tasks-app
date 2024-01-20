@@ -153,6 +153,7 @@ const HeaderFilter: FunctionComponent = () => {
         if (checkedStatuseList.length > 0) {
             status = checkedStatuseList.filter((item: IChecked) => item.checked === true).map((item: IChecked) => item.name);
             dispatch(setFilterStatus(status));
+            console.log(status)
         };
         if (checkedExecutorList.length > 0) {
             executor = checkedExecutorList.filter((item: IChecked) => item.checked === true).map((item: IChecked) => item.name);

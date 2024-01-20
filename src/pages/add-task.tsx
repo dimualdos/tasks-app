@@ -14,7 +14,7 @@ import { useUsersList } from "../hooks/use-usersList";
 import { useDirections } from "../hooks/use-direction";
 import styles from './css/add-tasks.module.css';
 import Modal from "../components/modal/modal";
-import { useStatus } from "../hooks/use-statuse";
+import { useStatus } from "../hooks/use-status";
 
 
 export const BoxAvatar = styled(Box)(({ theme }) => ({
@@ -60,15 +60,6 @@ export const AddTaskApp: FunctionComponent = () => {
     const { statusListFB } = useStatus();
     const { numberTask, addNewTask, chekedTasks } = useTask();
     const [isOpen, setIsOpen] = useState(false);
-
-    const handleClickButton = () => {
-        setIsOpen(!isOpen);
-        chekedTasks();
-    }
-    const handleClose = () => {
-        setIsOpen(!isOpen);
-    };
-
     const [nameTask, setNameTask] = useState({ value: '', style: false });
     const [linkTask, setLinkTask] = useState({ value: '', style: false });
     const [textDescription, setTextDescription] = useState('');
@@ -77,7 +68,17 @@ export const AddTaskApp: FunctionComponent = () => {
     const [status, setStatus] = useState({ value: '', style: false });
     const [currentUserData, setCurrentUserData] = useState({ value: '', style: false });
 
+    const handleClickButton = () => {
+        setIsOpen(!isOpen);
+        chekedTasks();
+    }
+    const handleClose = () => {
+        setIsOpen(false);
+    };
 
+
+
+    // функция по добавлению  задачи
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         // валидация обязательных полей
@@ -104,11 +105,8 @@ export const AddTaskApp: FunctionComponent = () => {
             currentUserData.value,
             textDescription,
         );
-
         setTimeout(() => {
             removeFieldWrapper();
-
-
         }, 2000)
     }
 

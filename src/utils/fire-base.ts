@@ -1,4 +1,4 @@
-import { getApp, initializeApp } from "firebase/app";
+import {  initializeApp } from "firebase/app";
 import { getFirestore } from '@firebase/firestore';
 import {
      getAuth,
@@ -7,11 +7,9 @@ import {
      signInWithEmailAndPassword,
      sendPasswordResetEmail,
      updateProfile,
-     signInWithCredential,
      GithubAuthProvider,
      OAuthProvider,
      GoogleAuthProvider,
-     onAuthStateChanged,
   } from 'firebase/auth';
   import { getStorage } from "firebase/storage";
 
@@ -26,11 +24,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
-const firebaseApp = getApp();
 export const getStorageFirebase = getStorage();
-//export const imagesRef = ref(storage, 'users-photo/' + File.name);
-
-// const storage = getStorage(firebaseApp, "gs://tasks-app-707e8.appspot.com");
 
 export const db = getFirestore(app);
 export const auth = getAuth(app);

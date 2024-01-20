@@ -16,7 +16,7 @@ export const useJobTitle = (idUser?: string | null) => {
         if (!userBaseData) { return };
         const unsubscribe = onSnapshot(q, snapshot => {
             const dataJobTitle = snapshot.docs.map(d => ({
-                ...(d.data() as any),
+                ...(d.data() as string[]),
                 _id: d.id,
 
             }));

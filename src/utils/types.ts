@@ -120,12 +120,16 @@ export interface IDirectionsLists7 {
 }
 
 export interface ITasksUser {
-    whoAddedTheTaskUserId?: string,
-    confirmDoneManager?: string,
-    executorTaskId?: string,
-    number?: number,
-    pendingConfirm?: string,
-    statusEditDoc?: boolean,
+    whoAddedTheTaskUserId: string,
+    confirmDoneManager: string,
+    executorTaskId: string,
+    number: number,
+    pendingConfirm: string,
+    statusEditDoc: boolean,
     _id?: string,
-    // nameTasksUser: string,
+    nameTask: string,
+    taskDescription: string,
+    taskDirection: string,
+    taskStatus: string,
+    timeAdding: string,
 }

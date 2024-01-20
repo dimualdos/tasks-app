@@ -3,7 +3,7 @@ import { Spinner } from "../components/spinner/spinner";
 import { styled } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Unstable_Grid2";
-import { ITasksItems } from "../utils/types";
+import { ITasksUser } from "../utils/types";
 import styles from "./css/new-tasks.module.css";
 import { useGetAllListQuery } from "../servises/rtk-query/tasks-api";
 import { NavLink } from "react-router-dom";
@@ -11,13 +11,15 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { OverflowDiv } from "../constants/constant-mui";
 import { useAppSelector } from "../hooks/hooks";
 import { useDirections } from "../hooks/use-direction";
-// import { fetchTasksServer, fetchTodos } from "../servises/slices/task-slice";
+import { useTaskList } from "../hooks/use-tasks-list";
+import { useUsersList } from "../hooks/use-usersList";
+import { useStatus } from "../hooks/use-status";
 
 export const ItemMain = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === "dark" ? theme.palette.primary.main : theme.palette.primary.main,
     ...theme.typography.body2,
     textAlign: "left",
-    color: theme.palette.mode === "dark" ? theme.palette.primary.contrastText : theme.palette.primary.contrastText,
+    color: theme.palette.mode === "dark" ? theme.palette.primary.contrastText : theme.palette.text.primary,
     display: "flex",
     flexDirection: "column",
     boxShadow: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
@@ -45,7 +47,6 @@ const ItemRight = styled("p")(({ theme }) => ({
 
 const LeftPaddingP = styled("p")(({ theme }) => ({
     paddingLeft: "15px",
-    color: theme.palette.mode === "dark" ? theme.palette.primary.contrastText : theme.palette.primary.contrastText,
 }));
 const LeftPaddingPNumber = styled('p')(({ theme }) => ({
     paddingLeft: "15px",
@@ -57,11 +58,11 @@ export const HeaderList: FunctionComponent = () => {
     return (
         <Grid justifyContent="center" >
             <Grid xs={12} >
-                <ItemHeader >
-                    <Grid xs={1} sx={{ mr: 3 }}>
+                <ItemHeader  >
+                    <Grid xs={3} sx={{ mr: 3 }}>
                         <LeftPaddingP>Статус</LeftPaddingP>
                     </Grid>
-                    <Grid xs={5}>
+                    <Grid xs={3}>
                         <LeftPaddingP >Номер/ Название</LeftPaddingP>
                     </Grid>
                     <Grid xs={3}>
@@ -78,46 +79,52 @@ export const HeaderList: FunctionComponent = () => {
 
 const DataItemsList = () => {
     const { directionsListFB } = useDirections();
-
+    const { tasksList } = useTaskList();
+    const { usersListFB } = useUsersList();
+    const { statusListFB } = useStatus();
     const { data = [], isFetching, isError, isLoading } = useGetAllListQuery("list");
     const { statusListData, directionsListData, executorsListData } = useAppSelector(state => state.filterData);
 
+    //логика: получаем tasksList, usersListFB, statusListFB, 
+    // и отображаем данные на странице из usersListFB
+    // направление, статус задачи, и исполнитель в массиве данных лежат в виде _id (который формируется динамически)
 
-    // if (isError) return <div>An error has occurred!</div>;
-    // if (isLoading) return <div>Loading</div>;
-    // if (isFetching) return <div>Fetching</div>;
+    if (tasksList) console.log(tasksList);
 
-
-
-    const items = data && data.filter((item: ITasksItems) => {
+    const items1 = tasksList && tasksList.filter((item: ITasksUser) => {
         if (statusListData.length === 0 && directionsListFB.length === 0 && executorsListData.length === 0) {
             return item;
-        } else if (statusListData.length > 0
-            && item.taskStatus
-            && item.taskStatus.name !== null
-            && statusListData.findIndex((elem: string) => elem === item.taskStatus!.name!) > -1
-            || executorsListData.length > 0
-            && item.currentUser
-            && item.currentUser !== null
-            && executorsListData.findIndex((elem: string) => elem === item.currentUser!.name!) > -1
-            || directionsListData.length > 0
-            && item.currentUser
-            && item.currentUser !== null
-            && directionsListData.findIndex((elem: string) => elem === item.currentUser!.name!) > -1
-        ) {
-            return item;
         }
+        // else if (statusListData.length > 0
+        //     && item.taskStatus
+        //     && item.taskStatus !== null
+        //     && statusListData.findIndex((elem: string) => elem._id === item.taskStatus!._id!) > -1
+        //     || executorsListData.length > 0
+        //     && item.currentUser
+        //     && item.currentUser !== null
+        //     && executorsListData.findIndex((elem: string) => elem === item.currentUser!.name!) > -1
+        //     || directionsListData.length > 0
+        //     && item.currentUser
+        //     && item.currentUser !== null
+        //     && directionsListData.findIndex((elem: string) => elem === item.currentUser!.name!) > -1
+        // ) {
+        //     return item;
+        // }
     }
-    ).map((itemTasks: any) => {
-
+    )
+    const items = tasksList && tasksList.map((itemTasks: any) => {
+        const statusName: any = statusListFB!.find((item: any) => item._id === itemTasks.taskStatus);
+        const directionName: any = directionsListFB!.find((item: any) => item._id === itemTasks.taskDirection);
+        const executorName: any = usersListFB!.find((item: any) => item._id === itemTasks.executorTaskId);
         return (
-            <Grid key={itemTasks.id} xs={12}>
+            <Grid key={itemTasks._id} xs={12}>
                 <Grid xs={12} >
                     <Item >
-                        <Grid xs={1} sx={{ mr: 3 }}>
-                            <LeftPaddingP>{itemTasks.taskStatus ? itemTasks.taskStatus.name : "Нет  статуса"}</LeftPaddingP>
+                        <Grid xs={3} sx={{ mr: 3 }}>
+                            <LeftPaddingP>{statusName ? statusName.name : "Нет  статуса"}</LeftPaddingP>
                         </Grid>
-                        <Grid xs={5}>
+                        <Grid xs={3}>
+                            {/* при нажатии на ссылку активируется компонент TaskDetail */}
                             <NavLink
                                 className={styles.textLinkTasks}
                                 to={`/tasks-number/${itemTasks.number}`} >
@@ -130,10 +137,10 @@ const DataItemsList = () => {
                             </NavLink>
                         </Grid>
                         <Grid xs={3}>
-                            <LeftPaddingP>{itemTasks.currentUser && itemTasks.currentUser.name ? itemTasks.currentUser.name : "Испонителя нет"}</LeftPaddingP>
+                            <LeftPaddingP>{executorName ? executorName.displayName : "Испонителя нет"}</LeftPaddingP>
                         </Grid>
                         <Grid xs={2}>
-                            <p>{itemTasks.direction && itemTasks.direction.name ? itemTasks.direction.name : "направления нет"}</p>
+                            <p>{directionName ? directionName.name : "направления нет"}</p>
                         </Grid>
                         <Grid xs={1}>
                             <ItemRight>{<MoreVertIcon />}</ItemRight>

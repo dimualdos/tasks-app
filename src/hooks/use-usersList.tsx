@@ -1,7 +1,8 @@
-import { query, collection, where, onSnapshot } from "firebase/firestore";
+import { query, collection, onSnapshot } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
 import { db } from "../utils/fire-base";
 import { useAuth } from "./hooks";
+import { IProfile } from "../utils/types";
 
 
 export const useUsersList = () => {
@@ -10,13 +11,13 @@ export const useUsersList = () => {
     const [usersListFB, setUsersListFB] = useState<any>()
     const q = query(collection(db, "users"));
 
-
+    // получение всех пользовавтелей
     useEffect(() => {
         if (!userBaseData) { return };
 
         const unsubscribe = onSnapshot(q, snapshot => {
             const dataDirection = snapshot.docs.map(d => ({
-                ...(d.data() as any)
+                ...(d.data() as IProfile[])
 
             }));
             setUsersListFB(dataDirection)
