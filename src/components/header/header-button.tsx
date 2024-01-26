@@ -20,7 +20,7 @@ export default function GroupHeaderButtons() {
                 },
             }}
         >
-            <ButtonGroup size="small" aria-label="small button group">
+            <ButtonGroup size="small" aria-label="small button group" sx={{ cursor: 'pointer' }}>
                 <Link to={'board-tasks'}>{location?.pathname === '/board-tasks'
                     ? <HeaderButtonActiveCompose variant="contained" key={"one"}>Доска</HeaderButtonActiveCompose>
                     : < HeaderButton sx={{ borderRight: 'none' }} variant="contained" key={"two"}>Доска</ HeaderButton>}</Link>

@@ -1,4 +1,4 @@
-import { BoardTasks, TasksList, AddTaskApp, LoginPage, ProfileUser } from "../../pages";
+import { BoardTasks, TasksList, LoginPage, ProfileUser } from "../../pages";
 import { ProtectedRoute } from "../../protected/protected-route";
 import { TasksDetail } from "../tasks-detail/tasks-detail";
 import { leftDrawerLinks } from "./left-drawer-links";
@@ -14,7 +14,7 @@ export const linkLists = [
         element: <ProtectedRoute ><TasksList /></ProtectedRoute>,
     },
     {
-        path: 'tasks-number/:id/*',
+        path: 'number-task/:id/*',
         element: <ProtectedRoute ><TasksDetail /></ProtectedRoute>,
     },
     {

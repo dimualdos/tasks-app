@@ -12,7 +12,11 @@ export const ItemGrid = styled(Grid)(({ theme }) => ({
     flexDirection: "column",
     color: theme.palette.mode === "dark" ? theme.palette.primary.contrastText : theme.palette.primary.contrastText,
     boxShadow: theme.palette.mode === "dark" ? "#1A2027" : "#fff",
-    borderRadius: "10px",
+    borderRadius: "5px",
+}));
+export const ModalAddTask = styled(ItemGrid)(({ theme }) => ({
+    backgroundColor: theme.palette.mode === "dark" ? theme.palette.primary.light : theme.palette.primary.main,
+  
 }));
 
 export const SenterBox = styled(Box)(({ theme }) => ({
@@ -59,12 +63,14 @@ export const HeaderButtonFilters = styled(HeaderButton)(({ theme }) => ({
 }));
 
 export const ItemBackground = styled(Paper)(({ theme }) => ({
-    backgroundColor: theme.palette.mode === "dark" ? theme.palette.secondary.main : theme.palette.background.default,
+    backgroundColor: theme.palette.mode === "dark" ? theme.palette.primary.main : theme.palette.background.default,
     ...theme.typography.body2,
     padding: theme.spacing(1),
     textAlign: "center",
     color: theme.palette.text.primary,
     margin: "0",
+    borderRadius: "5px",
+
 }));
 
 export const CheckBoxCustom = styled(Checkbox)(({ theme }) => ({
@@ -100,7 +106,7 @@ export const ItemTaskOverflow = styled("div")(({ theme }) => ({
         background: theme.palette.mode === "dark" ? "#2D3B4C" : theme.palette.background.default,
         borderRadius: "5px",
     },
-    maxHeight: `85vh`,
+    maxHeight: `80vh`,
     overflowY: "auto",
     overflowX: "hidden",
 }));

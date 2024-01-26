@@ -31,7 +31,7 @@ export const LoginPage: FunctionComponent = () => {
                     <Grid sx={{
                         display: 'flex',
                         flexDirection: 'column',
-                        gap: '20px', ":first-child": { textAlign: 'center' },
+                        gap: '20px', "::first-of-type": { textAlign: 'center' },
                         ":last-child": { alignContent: "center" }
                     }} xl={12} md={8}>
                         <h1 >Вход</h1>

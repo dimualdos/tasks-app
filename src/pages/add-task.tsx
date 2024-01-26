@@ -1,20 +1,21 @@
 import { FunctionComponent, useState } from "react";
 import Box from '@mui/material/Box';
-import TextField from '@mui/material/TextField';
 import { styled } from "@mui/material";
-import Grid from '@mui/system/Unstable_Grid';
 import { BadgeAvatars } from "../components/avatar/avatar";
 import { SelectRow } from "../components/select-task/select-row";
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
-import { HeaderButton, HeaderButtonActive } from "../constants/constant-mui";
-import { useTask } from "../hooks/useAddTask";
+import { HeaderButton, HeaderButtonActive, ModalAddTask } from "../constants/constant-mui";
+import { useTask } from "../hooks/useTask";
 import { useProfile } from "../hooks/use-profile";
 import { useUsersList } from "../hooks/use-usersList";
 import { useDirections } from "../hooks/use-direction";
 import styles from './css/add-tasks.module.css';
 import Modal from "../components/modal/modal";
 import { useStatus } from "../hooks/use-status";
+import Grid from '@mui/material/Unstable_Grid2';
+import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
+import { InputAdornments } from "../components/custom-input/custom-input";
 
 
 export const BoxAvatar = styled(Box)(({ theme }) => ({
@@ -56,9 +57,9 @@ const modulesRedactor = {
 export const AddTaskApp: FunctionComponent = () => {
     const { profile } = useProfile();
     const { usersListFB } = useUsersList();
-    const { directionsListFB } = useDirections();
+    const { directionsActive } = useDirections();
     const { statusListFB } = useStatus();
-    const { numberTask, addNewTask, chekedTasks } = useTask();
+    const { numberTask, addNewTask, chekedTasks, queryEditDoc } = useTask();
     const [isOpen, setIsOpen] = useState(false);
     const [nameTask, setNameTask] = useState({ value: '', style: false });
     const [linkTask, setLinkTask] = useState({ value: '', style: false });
@@ -75,8 +76,6 @@ export const AddTaskApp: FunctionComponent = () => {
     const handleClose = () => {
         setIsOpen(false);
     };
-
-
 
     // функция по добавлению  задачи
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -97,17 +96,31 @@ export const AddTaskApp: FunctionComponent = () => {
             return
         };
         // добавление задачи - в ней передаю id исполнителя,
-        addNewTask(nameTask.value,
-            numberTask!.number!,
-            linkTask.value,
-            status.value,
-            direction.value,
-            currentUserData.value,
-            textDescription,
-        );
+        if (queryEditDoc && queryEditDoc.length > 0) {
+            addNewTask(nameTask.value,
+                queryEditDoc[0]!.number!,
+                linkTask.value,
+                status.value,
+                direction.value,
+                currentUserData.value,
+                textDescription,
+                queryEditDoc[0]._id!,
+            );
+        } else {
+            addNewTask(nameTask.value,
+                numberTask!.number!,
+                linkTask.value,
+                status.value,
+                direction.value,
+                currentUserData.value,
+                textDescription,
+                numberTask!._id!,
+            );
+        }
+
         setTimeout(() => {
             removeFieldWrapper();
-        }, 2000)
+        }, 500)
     }
 
     const removeFieldWrapper = () => {
@@ -125,11 +138,11 @@ export const AddTaskApp: FunctionComponent = () => {
 
 
     return (
-        <Box>
+        <Box >
             <HeaderButtonActive size="small" variant="contained" onClick={handleClickButton}>+ Добавить задачу</HeaderButtonActive>
             {isOpen && <Modal tasksOverlay={true} onClose={handleClose} overlay={true}>
-                <Grid sx={{
-                    padding: '20px',
+                <ModalAddTask sx={{
+                    padding: '30px',
                 }} >
 
                     <Box sx={{
@@ -137,70 +150,84 @@ export const AddTaskApp: FunctionComponent = () => {
                         flexDirection: 'row',
                         justifyContent: 'space-between',
                     }}>
-                        <Grid xs={2} sx={{ minWidth: '20%' }}><BoxNumberTasks>{numberTask?.number} </BoxNumberTasks></Grid>
+                        <Grid xs={2} sx={{ minWidth: '20%' }}><BoxNumberTasks>
+                            {queryEditDoc && queryEditDoc.length > 0 ? queryEditDoc![0].number : numberTask?.number}
+                        </BoxNumberTasks></Grid>
                         <Grid xs={8}>{profile.photoURL ? <BoxAvatar >Автор <BadgeAvatars imageSrc={profile.photoURL}
                             data={profile.displayName} /></BoxAvatar> : null}
                         </Grid>
                     </Box >
-                    <ItemTask2>
+                    <ItemTask2 >
                         <form
                             onSubmit={handleSubmit}
                             method="post" id="outlined-controlled-form">
                             <Box
                                 sx={{
-                                    '& > :not(style)': { m: 1, width: '100%' },
+                                    '& > :not(style)': { m: 1 },
                                 }}
                             >
                                 {/* имя задачи */}
-                                <TextField
-                                    id="outlined-controlled"
-                                    label="Название задачи"
-                                    variant="filled"
-                                    multiline
-                                    value={nameTask.value}
-                                    onChange={(event) => {
+
+                                <InputAdornments
+                                    idInput="outlined-controlled"
+                                    typeInput={'text'}
+                                    ariaLabelInput="Название задачи"
+                                    placeholderInput="Название задачи"
+                                    // variant="filled"
+                                    valueInput={nameTask.value}
+                                    onChangeInput={(event: { target: { value: any; }; }) => {
                                         setNameTask({ value: event.target.value, style: false });
                                     }}
-                                    sx={nameTask.style === true ? { border: "2px dashed red", borderRadius: "7px" } : null}
+                                    nameInput={'Название задачи'}
+                                    sxTrue={nameTask.style}
                                 />
                                 <Box sx={{
-                                    flexDirection: 'row',
-                                    display: 'flex',
-                                    justifyContent: 'left',
                                     gap: '10px',
-                                    margin: '0 10px 0 10px',
+
                                 }}>
                                     {/* выбор исполнителя задачи */}
-                                    <SelectRow
-                                        //data={} -- передается пропсом данные компоненту
-                                        // value={currentUserData.value}
-                                        data={usersListFB}
-                                        nameOption="Исполнитель "
-                                        directionState={currentUserData.value}
-                                        ariaLabel={"Выпадающий список исполнителей работ"}
-                                        name="perfomer" id="perfomer"
-                                        onChange={(event: { target: { value: string; }; }) => setCurrentUserData({ value: event.target.value, style: false })}
-                                        stateStyleBolean={currentUserData.style}
+                                    <Grid2 container spacing={1} xs={12} sx={{
+                                        display: 'flex',
+                                        flexDirection: 'row',
+                                        flexWrap: 'nowrap',
+                                        justifyContent: 'space-between'
+                                    }}>
+                                        <SelectRow
+                                            //data={} -- передается пропсом данные компоненту
+                                            // value={currentUserData.value}
+                                            data={usersListFB}
+                                            nameOption="Исполнитель"
+                                            valueState={currentUserData.value}
+                                            ariaLabel={"Выпадающий список исполнителей работ"}
+                                            name="perfomer" id="perfomer"
+                                            onChange={(event: { target: { value: string; }; }) =>
+                                                setCurrentUserData({ value: event.target.value, style: false })}
+                                            stateStyleBolean={currentUserData.style}
 
-                                    />
-                                    <SelectRow
-                                        data={statusListFB}
-                                        nameOption="Статус"
-                                        directionState={status.value}
-                                        ariaLabel={"Выпадающий список выбора статуса задачи"}
-                                        name="status" id="satus"
-                                        onChange={(event: { target: { value: string; }; }) => setStatus({ value: event.target.value, style: false })}
-                                        stateStyleBolean={status.style}
-                                    />
-                                    <SelectRow
-                                        data={directionsListFB}
-                                        nameOption="Направление"
-                                        directionState={direction.value}
-                                        ariaLabel={"Выпадающий список выбора направлений"}
-                                        name="direction" id="direction"
-                                        onChange={(event: { target: { value: string; }; }) => setDirection({ value: event.target.value, style: false })}
-                                        stateStyleBolean={direction.style}
-                                    />
+                                        />
+                                        <SelectRow
+                                            data={statusListFB}
+                                            nameOption="Статус"
+                                            valueState={status.value}
+                                            ariaLabel={"Выпадающий список выбора статуса задачи"}
+                                            name="status" id="satus"
+                                            onChange={(event: { target: { value: string; }; }) =>
+                                                setStatus({ value: event.target.value, style: false })}
+                                            stateStyleBolean={status.style}
+                                        />
+                                        <SelectRow
+                                            data={directionsActive}
+                                            nameOption="Направление"
+                                            valueState={direction.value}
+                                            ariaLabel={"Выпадающий список выбора направлений"}
+                                            name="direction" id="direction"
+                                            onChange={(event: { target: { value: string; }; }) =>
+                                                setDirection({ value: event.target.value, style: false })}
+                                            stateStyleBolean={direction.style}
+                                        />
+
+                                    </Grid2>
+
                                 </Box>
 
                                 <Box sx={{ mt: 2 }}>
@@ -216,16 +243,19 @@ export const AddTaskApp: FunctionComponent = () => {
 
                                 </Box>
 
-                                <TextField
-                                    id="outlined-controlled2"
-                                    label="Ссылка на задачу"
-                                    multiline
-                                    variant="filled"
-                                    value={linkTask.value}
-                                    onChange={(event) => {
+
+                                <InputAdornments
+                                    idInput="outlined-controlled2"
+                                    typeInput={'text'}
+                                    ariaLabelInput="Ссылка на задачу"
+                                    placeholderInput="Ссылка на задачу"
+                                    // variant="filled"
+                                    valueInput={linkTask.value}
+                                    onChangeInput={(event: { target: { value: any; }; }) => {
                                         setLinkTask({ value: event.target.value, style: false });
                                     }}
-                                    sx={linkTask.style === true ? { border: "2px dashed red", borderRadius: "7px" } : null}
+                                    nameInput={'Ссылка на задачу'}
+                                    sxTrue={linkTask.style}
                                 />
                             </Box>
                             <Box sx={{ mb: 1, mr: 1, display: "flex", justifyContent: "right", gap: "20px", marginTop: "1em" }}>
@@ -249,7 +279,7 @@ export const AddTaskApp: FunctionComponent = () => {
                             </Box>
                         </form>
                     </ItemTask2>
-                </Grid >
+                </ModalAddTask >
             </Modal>
             }
 

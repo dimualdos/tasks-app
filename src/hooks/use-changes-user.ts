@@ -3,7 +3,10 @@ import { useMemo, useState } from "react";
 import { db } from "../utils/fire-base";
 import { useAuth } from "./hooks";
 
-export const useChangesUser = (idUser: string) => {
+
+
+// разрешения для пользователей в приложении
+export const useChangesUser = () => {
     const { userBaseData } = useAuth();
     const [isChangesUserLoading, setIsChangesUserLoading] = useState(false);
     const [errorState, setErrorState] = useState<unknown | null>(null);
@@ -11,15 +14,15 @@ export const useChangesUser = (idUser: string) => {
 
 
 
-    const updateChangesUser = async (userChanges: string) => {
-        if (!userBaseData || !userChanges || !idUser) { return };
+    const updateChangesUser = async (userChanges: string, idUser: string, changesBool: boolean) => {
+        if (!userBaseData || !userChanges) { return };
         const userRef = doc(db, "users", idUser);
 
         setIsChangesUserLoading(true);
-
         try {
             await updateDoc(userRef, {
-                changes: userChanges,
+                changesName: userChanges,
+                changes: changesBool,
             });
             setIsChangesUserLoading(false);
             setIsSuccessChanges(true);
@@ -32,7 +35,7 @@ export const useChangesUser = (idUser: string) => {
             setTimeout(() => {
                 setIsSuccessChanges(false);
                 setErrorState(null);
-            }, 3000);
+            }, 1500);
         }
     }
 

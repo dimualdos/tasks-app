@@ -83,7 +83,8 @@ export interface IProfile {
     email?: string;
     photoURL?: string;
     jobTitle?: string;
-    changes?: string;
+    changes?: boolean;
+    changesName?: string;
 }
 export interface IFieldObj {
     h2Data: string;
@@ -112,6 +113,7 @@ export interface IInputAdorments {
     typeInput?: string,
     nameInput?: string,
     ariaLabelInput?: string,
+    sxTrue?: boolean,
 }
 
 export interface IDirectionsLists7 {

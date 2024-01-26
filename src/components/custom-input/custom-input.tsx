@@ -1,11 +1,10 @@
 import * as React from 'react';
-import { Box, styled } from '@mui/system';
+import { styled } from '@mui/system';
 import { Button } from '@mui/base/Button';
 import { Input as BaseInput, InputProps, inputClasses } from '@mui/base/Input';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { IFieldCreateNew } from '../field-create/field-create-new';
-import { IFieldObj, IInputAdorments } from '../../utils/types';
+import { IInputAdorments } from '../../utils/types';
 
 
 export const Input = React.forwardRef(function CustomInput(
@@ -42,6 +41,7 @@ export const InputAdornments: React.FC<IInputAdorments> = ({
     onChangeInput,
     typeInput,
     nameInput,
+    sxTrue,
     ariaLabelInput,
     passwordInput = false
 }) => {
@@ -53,10 +53,6 @@ export const InputAdornments: React.FC<IInputAdorments> = ({
         showPassword: false,
     });
 
-    const handleChange =
-        (prop: keyof State) => (event: React.ChangeEvent<HTMLInputElement>) => {
-            setValues({ ...values, [prop]: event.target.value });
-        };
 
     const handleClickShowPassword = () => {
         setValues({
@@ -78,6 +74,7 @@ export const InputAdornments: React.FC<IInputAdorments> = ({
             onChange={onChangeInput}
             name={nameInput}
             placeholder={placeholderInput}
+            style={sxTrue ? { border: "2px dashed red", borderRadius: "7px" } : { border: 'none' }}
             endAdornment={typeInput === 'password' ?
                 <InputAdornment>
                     <IconButton

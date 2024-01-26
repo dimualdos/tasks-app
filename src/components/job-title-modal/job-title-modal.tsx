@@ -3,10 +3,11 @@ import Modal from "../modal/modal";
 import EditIcon from '@mui/icons-material/Edit';
 import { InputAdornments } from "../custom-input/custom-input";
 import Grid from "@mui/material/Unstable_Grid2";
-import { Box, Stack, Button, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent } from '@mui/material';
+import { Box, Stack, Button, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Alert } from '@mui/material';
 import { useAuth } from "../../hooks/hooks";
 import { useJobTitle } from "../../hooks/use-job-title";
 import { ItemGrid } from "../../constants/constant-mui";
+import { id } from "date-fns/locale";
 
 
 
@@ -14,8 +15,10 @@ interface IIdUsers {
     idUser: string | null,
 }
 
+// Модальное окно со списками активных должностей
+
 export const JobTitleModal: FC<IIdUsers> = (idUserList) => {
-    const { updateJobUser, dataJobTitle } = useJobTitle(idUserList.idUser);
+    const { updateJobUser, activeJobTitle, isSuccesJob, errorState } = useJobTitle(idUserList.idUser);
     const [isOpen, setIsOpen] = useState(false);
     const [jobUser, setJobUser] = useState('');
 
@@ -37,7 +40,7 @@ export const JobTitleModal: FC<IIdUsers> = (idUserList) => {
         setTimeout(() => {
             removeFieldUser();
             setIsOpen(false)
-        }, 1500);
+        }, 1700);
     };
     const removeFieldUser = () => {
         setJobUser('');
@@ -53,13 +56,14 @@ export const JobTitleModal: FC<IIdUsers> = (idUserList) => {
                     sx={{
                         padding: '20px',
                         display: 'flex',
-                        justifyContent: 'center'
-                    }} xs={12}
+                        alignItems: 'center',
+                        flexDirection: "column"
+                    }} xs={12} md={12} xl={12} lg={12}
                 >
-                    <Grid sx={{ textAlign: 'center' }}>
-                        <h2>Изменить должность</h2>
-                    </Grid>
 
+                    <Box sx={{ textAlign: 'center' }}>
+                        <h2>Изменить должность</h2>
+                    </Box>
 
                     <form
                         onSubmit={handleUpdateJobUser}>
@@ -78,7 +82,7 @@ export const JobTitleModal: FC<IIdUsers> = (idUserList) => {
                                     label="Age"
                                     onChange={handleJobSelect}
                                 >
-                                    {dataJobTitle.map((item: { name: string }, i: number) => <MenuItem
+                                    {activeJobTitle.map((item: { name: string }, i: number) => <MenuItem
                                         key={i} value={item.name}>{item.name}</MenuItem>)}
                                 </Select>
                             </FormControl>
@@ -94,6 +98,13 @@ export const JobTitleModal: FC<IIdUsers> = (idUserList) => {
                             </Stack>
                         </Grid>
                     </form>
+
+
+                    <Box>
+                        {isSuccesJob ? <Alert severity="success">Должность изменена</Alert> : null}
+                        {errorState ? <Alert severity="error">{`${errorState}`}</Alert> : null}
+                    </Box>
+
                 </Grid>
             </Modal >}
         </Box >

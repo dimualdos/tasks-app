@@ -5,15 +5,12 @@ import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Unstable_Grid2";
 import { ITasksUser } from "../utils/types";
 import styles from "./css/new-tasks.module.css";
-import { useGetAllListQuery } from "../servises/rtk-query/tasks-api";
 import { NavLink } from "react-router-dom";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import { OverflowDiv } from "../constants/constant-mui";
 import { useAppSelector } from "../hooks/hooks";
-import { useDirections } from "../hooks/use-direction";
-import { useTaskList } from "../hooks/use-tasks-list";
-import { useUsersList } from "../hooks/use-usersList";
-import { useStatus } from "../hooks/use-status";
+import { useDirections, useTaskList, useUsersList, useStatus } from "../hooks";
+
 
 export const ItemMain = styled(Paper)(({ theme }) => ({
     backgroundColor: theme.palette.mode === "dark" ? theme.palette.primary.main : theme.palette.primary.main,
@@ -53,8 +50,16 @@ const LeftPaddingPNumber = styled('p')(({ theme }) => ({
     color: theme.palette.mode === "dark" ? theme.palette.text.secondary : theme.palette.primary.contrastText,
 }));
 
-export const HeaderList: FunctionComponent = () => {
+//логика компонента TasksList: получаем tasksList, usersListFB, statusListFB, 
+// и отображаем данные на странице из usersListFB
+// направление, статус задачи, и исполнитель в массиве данных лежат в виде _id (который формируется динамически);
+//в базе данных к напрвалению, статусу, создателю задачи и исполнителю прикрепляются уникальные ID
+// если напрваление или статус или исполнитель удалены,
+// то в соотвествующих полях будет стоять запись "статуса нет" "направления нет" "исполнителя нет"
 
+
+export const HeaderList: FunctionComponent = () => {
+    // формируем хедер списка
     return (
         <Grid justifyContent="center" >
             <Grid xs={12} >
@@ -82,39 +87,24 @@ const DataItemsList = () => {
     const { tasksList } = useTaskList();
     const { usersListFB } = useUsersList();
     const { statusListFB } = useStatus();
-    const { data = [], isFetching, isError, isLoading } = useGetAllListQuery("list");
     const { statusListData, directionsListData, executorsListData } = useAppSelector(state => state.filterData);
 
-    //логика: получаем tasksList, usersListFB, statusListFB, 
-    // и отображаем данные на странице из usersListFB
-    // направление, статус задачи, и исполнитель в массиве данных лежат в виде _id (который формируется динамически)
 
-    if (tasksList) console.log(tasksList);
-
-    const items1 = tasksList && tasksList.filter((item: ITasksUser) => {
-        if (statusListData.length === 0 && directionsListFB.length === 0 && executorsListData.length === 0) {
+    const items = tasksList && tasksList.sort((a, b) => b.number - a.number).filter((item: ITasksUser) => {
+        if (statusListData.length === 0 && directionsListData.length === 0) {
             return item;
         }
-        // else if (statusListData.length > 0
-        //     && item.taskStatus
-        //     && item.taskStatus !== null
-        //     && statusListData.findIndex((elem: string) => elem._id === item.taskStatus!._id!) > -1
-        //     || executorsListData.length > 0
-        //     && item.currentUser
-        //     && item.currentUser !== null
-        //     && executorsListData.findIndex((elem: string) => elem === item.currentUser!.name!) > -1
-        //     || directionsListData.length > 0
-        //     && item.currentUser
-        //     && item.currentUser !== null
-        //     && directionsListData.findIndex((elem: string) => elem === item.currentUser!.name!) > -1
-        // ) {
-        //     return item;
-        // }
-    }
-    )
-    const items = tasksList && tasksList.map((itemTasks: any) => {
-        const statusName: any = statusListFB!.find((item: any) => item._id === itemTasks.taskStatus);
-        const directionName: any = directionsListFB!.find((item: any) => item._id === itemTasks.taskDirection);
+        else if ((item.taskStatus !== null || item.taskDirection !== null) && (
+            statusListData.findIndex((elem: { id: string }) => elem.id === item.taskStatus) > -1 ||
+            directionsListData.findIndex((elem: { id: string }) => elem.id === item.taskDirection) > -1)
+        ) {
+            console.log(item)
+            return item;
+        }
+    }).map((itemTasks) => {
+        // console.log(directionsListFB);
+        const statusName: { name: string, _id: string } = statusListFB!.find((item: any) => item._id === itemTasks.taskStatus);
+        const directionName: { name: string, _id: string } = directionsListFB!.find((item: any) => item._id === itemTasks.taskDirection);
         const executorName: any = usersListFB!.find((item: any) => item._id === itemTasks.executorTaskId);
         return (
             <Grid key={itemTasks._id} xs={12}>
@@ -123,23 +113,25 @@ const DataItemsList = () => {
                         <Grid xs={3} sx={{ mr: 3 }}>
                             <LeftPaddingP>{statusName ? statusName.name : "Нет  статуса"}</LeftPaddingP>
                         </Grid>
-                        <Grid xs={3}>
-                            {/* при нажатии на ссылку активируется компонент TaskDetail */}
+                        <Grid xs={3} sx={{ cursor: 'pointer' }}>
+                            {/* при нажатии на ссылку активируется компонент TaskDetail  с номером задачи*/}
                             <NavLink
                                 className={styles.textLinkTasks}
-                                to={`/tasks-number/${itemTasks.number}`} >
+                                to={`/number-task/${itemTasks.number}`}
+
+                            >
                                 <LeftPaddingPNumber className={styles.rowRadioSwitch}>
                                     <u >Задание №{itemTasks.number}</u>
                                 </LeftPaddingPNumber>
 
-                                <h4><LeftPaddingP>{itemTasks.name && itemTasks.name.length > 50 ? itemTasks.name.substring(0, 50) + "..." : itemTasks.name}</LeftPaddingP></h4>
+                                {/* <h4><LeftPaddingP>{itemTasks.name && itemTasks.name.length > 50 ? itemTasks.name.substring(0, 50) + "..." : itemTasks.name}</LeftPaddingP></h4> */}
 
                             </NavLink>
                         </Grid>
                         <Grid xs={3}>
                             <LeftPaddingP>{executorName ? executorName.displayName : "Испонителя нет"}</LeftPaddingP>
                         </Grid>
-                        <Grid xs={2}>
+                        <Grid xs={2} >
                             <p>{directionName ? directionName.name : "направления нет"}</p>
                         </Grid>
                         <Grid xs={1}>

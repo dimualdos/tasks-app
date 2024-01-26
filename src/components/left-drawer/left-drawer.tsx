@@ -10,37 +10,56 @@ import { leftListPages } from './left-list-pages';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { ItemGrid, ItemTaskOverflow } from '../../constants/constant-mui';
 import Grid from "@mui/material/Unstable_Grid2";
+import MessageIcon from '@mui/icons-material/Message';
 import styles from './left-drawer.module.css'
+import { useProfile } from '../../hooks';
 
 
 const drawerWidth = 240;
 
 export const LeftDrawer: React.FC = () => {
     let location = useLocation();
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const { profile } = useProfile();
 
     const drawer = (
         <ItemGrid>
             <ItemTaskOverflow>
                 <List>
-                    {leftListPages.map((item, index) => (
+                    {profile && profile.changes ?
+                        leftListPages.map((item, index) => (
 
-                        <ListItem key={index}
-                            onClick={() => navigate(item.path)}
-                            className={location.pathname === `/user-panel/${item.path}`
+                            <ListItem key={index}
+                                onClick={() => navigate(item.path)}
+                                className={location.pathname === `/user-panel/${item.path}`
+                                    ? styles.pendingLinkDrawer : ''}
+                            >
+                                <Box >
+                                    <ListItemButton>
+                                        <ListItemIcon >
+                                            {location.pathname === `/user-panel/${item.path}` ? item.icon1 : item.icon}
+                                        </ListItemIcon>
+                                        <ListItemText primary={item.text} />
+                                    </ListItemButton>
+                                </Box>
+                            </ListItem>
+
+                        )) : <ListItem
+                            onClick={() => navigate('messenger/')}
+                            className={location.pathname === `/user-panel/${'messenger/'}`
                                 ? styles.pendingLinkDrawer : ''}
                         >
                             <Box >
                                 <ListItemButton>
                                     <ListItemIcon >
-                                        {location.pathname === `/user-panel/${item.path}` ? item.icon1 : item.icon}
+                                        <MessageIcon sx={location.pathname === `/user-panel/${'messenger/'}` ? { color: "#0582a1" } : null} />
                                     </ListItemIcon>
-                                    <ListItemText primary={item.text} />
+                                    <ListItemText primary={'Переписка'} />
                                 </ListItemButton>
                             </Box>
                         </ListItem>
+                    }
 
-                    ))}
                 </List>
             </ItemTaskOverflow>
         </ItemGrid>

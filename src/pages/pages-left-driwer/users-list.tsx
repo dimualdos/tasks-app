@@ -1,17 +1,37 @@
 import { FC, useState } from "react";
 import EditIcon from '@mui/icons-material/Edit';
-import { Avatar, Box, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Table, TableBody, TableContainer, TablePagination, TableRow } from "@mui/material";
+import { Alert, Avatar, Box, FormControl, InputLabel, MenuItem, Select, SelectChangeEvent, Table, TableBody, TableContainer, TablePagination, TableRow } from "@mui/material";
 import { useUsersList } from "../../hooks/use-usersList"
 import { HeaderButton, HeaderButtonActive, ItemGrid, TableCellTheme } from "../../constants/constant-mui";
 import { IProfile } from "../../utils/types";
 import { JobTitleModal } from "../../components/job-title-modal/job-title-modal";
 import { useChangesUser } from "../../hooks/use-changes-user";
+import Grid2 from "@mui/material/Unstable_Grid2/Grid2";
+
+// массив для таблицы пользователей. 
+// разрешения для пользователей приложения всего 3 в данный момент
+// "Измененеие данных" позволяет получить доступ к боковой панели в том числе к созданию пользователей 
+// и к редактированию списка рользователей
+// 'Постановка задач' даёт доступ ограниченно к боковой панели (редактирование направлений, должностей, статусов задач)
+// 'Чтение' - это исполнитель задач
 
 const columns: string[] = ['Аватар', 'Имя', 'Почта', 'Должность', 'Разрешения'];
-const selectUsersChanges: string[] = ['Изменение данных', 'Постановка задач', 'Чтение']
+const selectUsersChanges: { changesName: string, changes: boolean }[] = [
+    {
+        changesName: 'Изменение данных',
+        changes: true
+    },
+    {
+        changesName: 'Постановка задач',
+        changes: true
+    },
+    {
+        changesName: 'Чтение',
+        changes: false
+    }
+]
 
 export const UsersList: FC = () => {
-
     const { usersListFB } = useUsersList();
 
     const [page, setPage] = useState(0);
@@ -19,7 +39,7 @@ export const UsersList: FC = () => {
     const [changes, setChanges] = useState('');
     const [isOpenBox, setIsOpenBox] = useState(false);
     const [idUser, setIdUser] = useState('');
-    const { errorState, isSuccesChanges, updateChangesUser, isChangesUserLoading } = useChangesUser(idUser as string);
+    const { errorState, isSuccesChanges, updateChangesUser, isChangesUserLoading } = useChangesUser();
 
     const handleChangePage = (event: unknown, newPage: number) => {
         setPage(newPage);
@@ -34,23 +54,26 @@ export const UsersList: FC = () => {
         setIdUser(id);
         setIsOpenBox(!isOpenBox);
     };
-
     const handleChangeSelect = (event: SelectChangeEvent) => {
         setChanges(event.target.value as string);
     };
 
-    const removeField = () => {
-        setChanges('');
-    };
-
     const updateChanges = (event: any) => {
         event.preventDefault();
-        updateChangesUser(changes);
+        const changesBoolean = selectUsersChanges.find(item => item.changesName === changes);
+        updateChangesUser(changes, idUser, changesBoolean!.changes);
         setTimeout(() => {
             removeField();
             setIsOpenBox(false);
-        }, 3000);
-    }
+        }, 1500);
+    };
+
+    const removeField = () => {
+        setChanges('');
+        setTimeout(() => {
+            setIsOpenBox(false);
+        }, 1000);
+    };
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: '20px', alignItems: 'center' }}>
@@ -72,6 +95,7 @@ export const UsersList: FC = () => {
                                 ))}
                             </TableRow>
                         </thead>
+                        {/* таблица со списком сотрудников */}
                         <TableBody>
                             {usersListFB &&
                                 usersListFB.map((row: IProfile) => {
@@ -86,15 +110,21 @@ export const UsersList: FC = () => {
                                             <TableCellTheme align={'left'}>
                                                 {row.email ? row.email : null}
                                             </TableCellTheme>
+
+                                            {/* // Модальное окно со списками активных должностей */}
+
                                             <TableCellTheme align={'left'}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                                                     {row.jobTitle ? row.jobTitle : null}{<JobTitleModal idUser={row._id} />}
                                                 </Box>
-
                                             </TableCellTheme>
+
+                                            {/* установление разрешений пользователя */}
                                             <TableCellTheme align={'center'}>
                                                 <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-                                                    {row.changes ? row.changes : null}<EditIcon sx={{ color: '#0582a1' }} fontSize="small" onClick={() => handleEditChanges(row._id)} />
+                                                    {row.changesName ? row.changesName : null}
+                                                    <EditIcon sx={{ color: '#0582a1' }}
+                                                        fontSize="small" onClick={() => handleEditChanges(row._id)} />
                                                 </Box>
                                             </TableCellTheme>
                                         </TableRow>
@@ -114,54 +144,60 @@ export const UsersList: FC = () => {
                 />
             </ItemGrid>
 
-            {isOpenBox && <ItemGrid xl={6} md={6} sm={6} xs={6} sx={{
+            {/* модальное окно с разрешениями пользователя в системе */}
+
+            {isOpenBox && <Grid2 xl={12} md={12} sm={12} xs={12} container sx={{
                 display: 'flex',
-                alignItems: 'center', flexDirection: 'column', gap: '10px',
+                justifyContent: 'center', flexDirection: 'row',
                 '& :first-of-type': { paddingTop: '5px' }
-            }}>
-                <form
-                    onSubmit={updateChanges}
-                    id='form-users-list' >
+            }} >
+                <ItemGrid xl={6} md={6} sm={6} xs={6} sx={{ padding: '20px 20px 0 20px' }}>
+                    <form
+                        onSubmit={updateChanges}
+                        id={idUser} >
 
-                    <FormControl fullWidth>
-                        <InputLabel id="changes-simple-select-label">Установить разрешение</InputLabel>
-                        <Select
-                            labelId="changes-simple-select-label"
-                            id="changes-simple-select"
-                            value={changes}
-                            label="Age"
-                            onChange={handleChangeSelect}
-                        >
-                            {selectUsersChanges.map((item, i) => <MenuItem
-                                key={i} value={item}>{item}</MenuItem>)}
-                        </Select>
-                    </FormControl>
+                        <FormControl fullWidth>
+                            <InputLabel id={idUser}>Установить разрешение</InputLabel>
+                            <Select
+                                labelId={idUser}
+                                id={idUser}
+                                value={changes}
+                                label="Установить разрешение"
+                                onChange={handleChangeSelect}
+                            >
+                                {selectUsersChanges.map((item, i) => <MenuItem
+                                    key={i} value={item.changesName}>{item.changesName}</MenuItem>)}
+                            </Select>
+                        </FormControl>
 
-                    <Box sx={{ mb: 1, mr: 1, display: 'flex', justifyContent: 'right', gap: '20px', marginTop: '1em' }}>
-                        <HeaderButton
-                            variant="contained"
-                            size="small"
-                            type="button"
-                            onClick={removeField}
-                        >
-                            Очистить поля
-                        </HeaderButton>
-                        <HeaderButtonActive
-                            variant="contained"
-                            size="small"
-                            type={'submit'}
-                            disabled={isChangesUserLoading}
-                        >
-                            {'Обновить'}
-                        </HeaderButtonActive>
-                    </Box>
-                </form>
-                {errorState ? <p>{`${errorState}`}</p> : null}
-                {isSuccesChanges ? <p>Изменения сохранены!</p> : null}
-            </ItemGrid>
+                        <Box sx={{ mb: 1, mr: 1, display: 'flex', justifyContent: 'right', gap: '20px', marginTop: '1em' }}>
+                            <HeaderButton
+                                variant="contained"
+                                size="small"
+                                type="button"
+                                id={idUser}
+                                onClick={removeField}
+                            >
+                                Очистить поля
+                            </HeaderButton>
+                            <HeaderButtonActive
+                                variant="contained"
+                                size="small"
+                                type={'submit'}
+                                id={idUser}
+                                disabled={isChangesUserLoading}
+                            >
+                                {'Обновить'}
+                            </HeaderButtonActive>
+                        </Box>
+                    </form>
+                    {errorState ? <Alert severity="error">{`${errorState}`}</Alert> : null}
+                    {isSuccesChanges ? <Alert severity="success">Изменения сохранены!</Alert> : null}
+                </ItemGrid>
+            </Grid2>
+
             }
         </Box>
-
     )
 }
 

@@ -1,4 +1,4 @@
-import { query, collection,  onSnapshot, addDoc, deleteDoc, doc } from "firebase/firestore";
+import { query, collection,  onSnapshot, addDoc, deleteDoc, doc, where, updateDoc } from "firebase/firestore";
 import { useEffect, useMemo, useState } from "react";
 import { db } from "../utils/fire-base";
 import { useAuth } from "./hooks";
@@ -8,21 +8,59 @@ import { useAuth } from "./hooks";
 export const useDirections = () => {
     const { userBaseData } = useAuth();
     const [directionsListFB, setDirectionsListFB] = useState<any>();
-    const [isDirectionLoading, setIsDirectioneLoading] = useState(false)
+    const [directionsArchive, setDirectionsArchive] = useState<any>();
+    const [isDirectionLoading, setIsDirectionLoading] = useState(false)
     const [errorState, setErrorState] = useState<unknown | null>(null);
     const [isSuccesDirection, setIsSuccessDirection] = useState(false);
+    const [directionsActive, setDirectionsActive] = useState<any>();
+    const directionsRef = collection(db, "direction");
 
     useEffect(() => {
         if(!userBaseData) {return};
-        const q = query(collection(db, "direction"));
+        const q = query(directionsRef);
       
       const unsubscribe = onSnapshot(q, snapshot => {
              const dataDirection = snapshot.docs.map(d => ({
-            ...(d.data() as {name: string}[] ),
+            ...(d.data() as {name: string, status: boolean}[] ),
             _id: d.id,
           
           }));
             setDirectionsListFB(dataDirection)
+         
+        });
+   return () => unsubscribe();
+       }, [userBaseData]);
+
+
+       useEffect(() => {
+        if(!userBaseData) {return};
+        const q = query(directionsRef, where("status", '==', true));
+      
+      const unsubscribe = onSnapshot(q, snapshot => {
+             const dataDirection = snapshot.docs.map(d => ({
+            ...(d.data() as {name: string, status: boolean}[] ),
+            _id: d.id,
+          
+          }));
+            setDirectionsActive(dataDirection)
+         
+        });
+   return () => unsubscribe();
+
+    }, [userBaseData]);
+
+
+    useEffect(() => {
+        if(!userBaseData) {return};
+        const q = query(directionsRef, where("status", '==', false));
+      
+      const unsubscribe = onSnapshot(q, snapshot => {
+             const dataDirection = snapshot.docs.map(d => ({
+            ...(d.data() as {name: string, status: boolean}[] ),
+            _id: d.id,
+          
+          }));
+          setDirectionsArchive(dataDirection)
          
         });
    return () => unsubscribe();
@@ -32,16 +70,17 @@ export const useDirections = () => {
    
    const addDirection =  (direction: string) => {
        if(!direction) return;
-       setIsDirectioneLoading(true);
+       setIsDirectionLoading(true);
         try {
         addDoc(collection(db, "direction"), {
             name: direction,
+            status: true
         });
-        setIsDirectioneLoading(false);
+        setIsDirectionLoading(false);
         setIsSuccessDirection(true);
     } catch (error) {
         setErrorState(error);
-        setIsDirectioneLoading(false);
+        setIsDirectionLoading(false);
         setIsSuccessDirection(false);
     } finally {
         setTimeout(() => {
@@ -51,18 +90,61 @@ export const useDirections = () => {
     }
 };
 
-const deleteDirection = (_id: string) => {
+const updateDirectionArchive = (_id: string) => {
     if(!_id) return;
-    console.log(_id);
 
-    setIsDirectioneLoading(true);
+    setIsDirectionLoading(true);
     try {
-        deleteDoc (doc(db, "direction", _id));
-        setIsDirectioneLoading(false);
+        // deleteDoc (doc(db, "direction", _id));
+        updateDoc(doc(directionsRef, _id), {
+            status: false
+        })
+        setIsDirectionLoading(false);
         setIsSuccessDirection(true);
     } catch (error) {
         setErrorState(error);
-        setIsDirectioneLoading(false);
+        setIsDirectionLoading(false);
+        setIsSuccessDirection(false);
+    } finally {
+        setTimeout(() => {
+            setErrorState(null);
+            setIsSuccessDirection(false);
+        }, 5000)
+    }
+}
+const restoreDirection = (_id: string) => {
+    if(!_id) return;
+
+    setIsDirectionLoading(true);
+    try {
+        updateDoc(doc(directionsRef, _id), {
+            status: true
+        })
+        setIsDirectionLoading(false);
+        setIsSuccessDirection(true);
+    } catch (error) {
+        setErrorState(error);
+        setIsDirectionLoading(false);
+        setIsSuccessDirection(false);
+    } finally {
+        setTimeout(() => {
+            setErrorState(null);
+            setIsSuccessDirection(false);
+        }, 5000)
+    }
+}
+const deleteDirection = (_id: string) => {
+    if(!_id) return;
+
+    setIsDirectionLoading(true);
+    try {
+        deleteDoc (doc(db, "direction", _id));
+       
+        setIsDirectionLoading(false);
+        setIsSuccessDirection(true);
+    } catch (error) {
+        setErrorState(error);
+        setIsDirectionLoading(false);
         setIsSuccessDirection(false);
     } finally {
         setTimeout(() => {
@@ -73,10 +155,17 @@ const deleteDirection = (_id: string) => {
 }
 
 const valueDirections = useMemo(() => ({
-    directionsListFB, isDirectionLoading, 
-    errorState, isSuccesDirection,
-    deleteDirection, addDirection
-}), [directionsListFB, errorState, isDirectionLoading, isSuccesDirection ]);
+    directionsListFB,
+    directionsArchive,
+    isDirectionLoading,
+    directionsActive, 
+    errorState,
+    isSuccesDirection,
+    deleteDirection,
+    restoreDirection,
+    addDirection,
+    updateDirectionArchive
+}), [directionsArchive, directionsActive, directionsListFB, errorState, isDirectionLoading, isSuccesDirection ]);
 
         return valueDirections
 };

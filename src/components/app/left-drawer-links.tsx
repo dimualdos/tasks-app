@@ -5,23 +5,23 @@ import { ProtectedRoute } from "../../protected/protected-route";
 export const leftDrawerLinks = [
     {
         path: 'create-user/*',
-        element: <ProtectedRoute ><CreateUser /></ProtectedRoute>,
+        element: <ProtectedRoute changesData={true}><CreateUser /></ProtectedRoute>,
     },
     {
         path: 'users-list/*',
-        element: <ProtectedRoute ><UsersList /></ProtectedRoute>,
+        element: <ProtectedRoute changesData={true}><UsersList /></ProtectedRoute>,
     },
     {
         path: 'job-title/*',
-        element: <ProtectedRoute ><CreateJobTitle /></ProtectedRoute>,
+        element: <ProtectedRoute changesData={true}><CreateJobTitle /></ProtectedRoute>,
     },
     {
         path: 'create-direction/*',
-        element: <ProtectedRoute ><CreateDirections /></ProtectedRoute>,
+        element: <ProtectedRoute changesData={true}><CreateDirections /></ProtectedRoute>,
     },
     {
         path: 'status-task/*',
-        element: <ProtectedRoute ><CreateStatusTask /></ProtectedRoute>,
+        element: <ProtectedRoute changesData={true}><CreateStatusTask /></ProtectedRoute>,
     },
     {
         path: 'messenger/*',

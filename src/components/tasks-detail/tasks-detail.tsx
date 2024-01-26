@@ -1,20 +1,21 @@
-import { FunctionComponent, useMemo } from "react";
+import { FunctionComponent, useEffect, useMemo, useState } from "react";
 import { Spinner } from "../spinner/spinner";
 import { styled } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
 import Grid from "@mui/material/Unstable_Grid2";
-import Chat from "../chat/chat";
 import { useParams } from "react-router-dom";
-import styles from "./tasks-detail.module.css";
-import { useGetTasksIdQuery } from "../../servises/rtk-query/tasks-api";
 import Box from "@mui/material/Box";
 import { BoxAvatar } from "../../pages/add-task";
-import { BadgeAvatars } from "../avatar/avatar";
-import { useTaskList } from "../../hooks/use-tasks-list";
-import { useUsersList } from "../../hooks/use-usersList";
-import { useStatus } from "../../hooks/use-status";
-import { useDirections } from "../../hooks/use-direction";
 import Avatar from "@mui/material/Avatar";
+import { SelectRow } from "../select-task/select-row";
+import Grid2 from "@mui/material/Unstable_Grid2";
+import { HeaderButtonActive } from "../../constants/constant-mui";
+import { useTask, useTaskList, useUsersList, useStatus, useDirections } from "../../hooks";
+import { useAppDispatch, useAppSelector } from "../../hooks/hooks";
+import { Alert } from "@mui/material";
+import { AppDispatch } from "../../servises/store";
+import { createIDTask } from '../../servises/redusers/id-task-user-board-reducer';
+
 
 
 
@@ -45,10 +46,36 @@ const BoxSelect = styled(Box)(({ theme }) => ({
 
 export const TasksDetail: FunctionComponent = () => {
     let { id } = useParams();
+    const { idTaskBoard } = useAppSelector(state => state.idTaskTarget);
+    const dispatch: AppDispatch = useAppDispatch();
+
     const { tasksList } = useTaskList();
     const { usersListFB } = useUsersList();
-    const { statusListFB } = useStatus();
+    const { statusListFB, statusActive } = useStatus();
     const { directionsListFB } = useDirections();
+    const { updateTargetTask, isSuccesUpdateTasks, isLoadingUpdateTask, errorStateTask } = useTask();
+    const [statusTaskUser, setStatusTaskUser] = useState({ value: '', style: false });
+
+    useEffect(() => {
+        const taskID: any = tasksList && tasksList!.find((item: any) => item.number === +`${id}`);
+        if (taskID) dispatch(createIDTask(taskID._id));
+
+    }, [id, tasksList]);
+
+    const handleSubmit = async (event: any) => {
+        event.preventDefault();
+        // валидация обязательных полей
+        if (!statusTaskUser.value.trim().length) {
+            statusTaskUser.value.trim().length === 0 ? setStatusTaskUser({ value: statusTaskUser.value.trim(), style: true }) : setStatusTaskUser({ value: statusTaskUser.value.trim(), style: false });
+            alert('Заполните все поля');
+            return
+        };
+        updateTargetTask(
+            statusTaskUser.value,
+            idTaskBoard,
+        );
+    };
+
 
     const taskItem = useMemo(() => {
         const taskID: any = tasksList && tasksList!.find((item: any) => item.number === +`${id}`);
@@ -57,29 +84,68 @@ export const TasksDetail: FunctionComponent = () => {
         const currentUser = usersListFB && usersListFB!.find((item: any) => item._id === taskID.executorTaskId);
         const taskStatus = statusListFB && statusListFB!.find((item: any) => item._id === taskID.taskStatus);
         const direction = directionsListFB && directionsListFB!.find((item: any) => item._id === taskID.taskDirection);
-        console.log(currentUser)
+
         return (
-            <Grid xs={8} >
+            <Grid xs={12} >
                 <ItemTask >
+                    {errorStateTask ? <Alert severity="error">{`${errorStateTask}`}</Alert> : null}
                     <ItemTask2>
                         <Box sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                            <Grid display={"flex"} alignItems={"center"} xs={3}><div>Задание № {taskID ? `${taskID.number}` : null}</div></Grid>
-                            <Grid sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }} >
-                                <Grid sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', flexWrap: 'nowrap' }}>
+                            <Grid2 display={"flex"} alignItems={"center"} xs={3}><div>Задание № {taskID ? `${taskID.number}` : null}</div></Grid2>
+                            <Grid2 sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', }} >
+                                <Grid2 sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', flexWrap: 'nowrap' }}>
                                     <BoxAvatar>Автор <Avatar alt="name" src={customer ? customer.photoURL : "Автора нет"} /></BoxAvatar>
                                     {customer ? customer.displayName : null},
-                                </Grid>
+                                </Grid2>
                                 <Box>почта: {customer ? customer.email : null}</Box>
-                            </Grid>
+                            </Grid2>
                         </Box >
 
                         <h1>{taskID ? taskID.nameTask : null}</h1>
 
-                        <Box display={"flex"} flexDirection={"row"} justifyContent={"space-between"}>
-                            <Grid xs={6}><BoxAvatarLeft><Avatar alt="name" src={currentUser ? currentUser.photoURL : "Исполнителя нет"} /><>{currentUser ? currentUser.displayName : "Исполнителя нет"}</></BoxAvatarLeft></Grid>
-                            <Grid xs={3} display={"flex"} alignItems={"center"}><BoxSelect>{taskStatus ? taskStatus.name : "статуса нет"}</BoxSelect></Grid>
-                            <Grid xs={3} display={"flex"} alignItems={"center"}><BoxSelect>{direction ? direction.name : "направления нет"}</BoxSelect></Grid>
-                        </Box>
+                        <Grid2 sx={{ display: 'flex', flexDirection: 'row', alignItems: 'flex-start' }}>
+                            <Grid2 xs={6}>
+                                <BoxAvatarLeft>
+                                    <Avatar alt="name" src={currentUser ? currentUser.photoURL : "Исполнителя нет"} />
+                                    {currentUser ? currentUser.displayName : "Исполнителя нет"}
+                                </BoxAvatarLeft>
+                            </Grid2>
+                            <Grid2 xs={3} sx={{ flexDirection: 'column', alignItems: 'center', padding: '0' }}>
+                                <form
+                                    onSubmit={handleSubmit}
+                                    id={'edit-tasks'}>
+
+                                    <SelectRow
+                                        //data={} -- передается пропсом данные компоненту
+                                        // value={currentUserData.value}
+                                        data={statusActive}
+                                        nameOption={taskStatus ? taskStatus!.name : "статуса нет"}
+                                        valueState={statusTaskUser.value}
+                                        ariaLabel={"Статус работ"}
+                                        name="statusUser" id="status-id"
+                                        onChange={(event: { target: { value: string; }; }) =>
+                                            setStatusTaskUser({ value: event.target.value, style: false })}
+                                        stateStyleBolean={statusTaskUser.style}
+                                    />
+                                    <HeaderButtonActive
+                                        variant="contained"
+                                        size="small"
+                                        type="submit"
+                                        disabled={isLoadingUpdateTask}
+                                    >
+                                        {isSuccesUpdateTasks ? 'Изменения сохранены!' : 'Изменить статус'}
+                                    </HeaderButtonActive>
+
+                                </form>
+
+                            </Grid2>
+                            <Grid2 xs={3} >
+
+                                <BoxSelect sx={{ height: '35px', }}>
+                                    {direction ? <Box sx={{ paddingTop: '8px' }}>{direction.name}</Box> : <Box sx={{ paddingTop: '8px' }}>направления нет</Box>}
+                                </BoxSelect>
+                            </Grid2>
+                        </Grid2>
 
                         <hr />
                         {/* описание задачи при помощи dangerouslySetInnerHTML */}
@@ -87,18 +153,18 @@ export const TasksDetail: FunctionComponent = () => {
 
                     </ItemTask2>
 
-                </ItemTask>
-            </Grid>
+                </ItemTask >
+            </Grid >
         )
-    }, [directionsListFB, id, statusListFB, tasksList, usersListFB])
+    }, [tasksList, usersListFB, statusListFB, directionsListFB, errorStateTask, isSuccesUpdateTasks, statusActive, statusTaskUser.value, statusTaskUser.style, isLoadingUpdateTask, id])
 
     return (
         <Grid container xs={12} spacing={2} justifyContent={"center"}>
             <Grid xs={10} container justifyContent={"center"}>
                 {taskItem ? taskItem : (<Spinner />)}
-                <Grid xs={4} >
+                {/* <Grid xs={4} >
                     <ItemTask> <Chat /></ItemTask>
-                </Grid>
+                </Grid> */}
             </Grid>
         </Grid>
     )

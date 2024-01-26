@@ -2,7 +2,7 @@ import React, { FC, ChangeEvent, useRef } from "react";
 import { FieldCreateFireBase } from "../components/field-create/field-create-firebase";
 import { auth } from "../utils/fire-base";
 import { IOnChangeEvent } from "../utils/types";
-import { Avatar, Box, styled } from "@mui/material";
+import { Alert, Avatar, Box, styled } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { H2Theme, H3Theme, HeaderButton, HeaderButtonActive, ItemGrid, ItemTaskOverflow } from "../constants/constant-mui";
 import { useState } from "react";
@@ -21,9 +21,7 @@ const InputElement = styled('input')(
 export const ProfileUser: FC = () => {
     const user = auth.currentUser;
     const { profile } = useProfile();
-    // const [email, setEmail] = useState("");
     const [name, setName] = useState("");
-    // const [password, setPassword] = useState("");
     const [filePhoto, setFilePhoto] = useState<any>();
     const fileInput = useRef<any>(null);
     const { isLoadingProfile, updateNameProfileUser, isSuccesProfile, isLoadingPhotoProfile, errorState, updatePhotoProfileUser } = useUpdateProfileUsers();
@@ -76,8 +74,7 @@ export const ProfileUser: FC = () => {
 
     const removeFieldUser = () => {
         setName('');
-        // setEmail('');
-        // setPassword('');
+
     }
     const removeFildePhoto = () => {
         setFilePhoto(null);
@@ -137,8 +134,7 @@ export const ProfileUser: FC = () => {
 
     return (
         <ItemTaskOverflow>
-            {/* {isLoading ? <p>Loading...</p> : null}
-            {isSucces ? <p>Изменения сохранены!</p> : null} */}
+
             {profile! && profile._id ? (
                 <Grid container display={"flex"} flexDirection={"column"} alignItems="center" xs={12}>
                     <H2Theme>Ваш профиль</H2Theme>
@@ -156,7 +152,7 @@ export const ProfileUser: FC = () => {
                                 theme.palette.primary.main,
                         mb: '20px'
                     }}>
-                        {isSuccesProfile ? 'Данные обновлены' : 'Вы можете изменить имя или обновть фото'}
+                        {isSuccesProfile ? <Alert severity="success">Данные обновлены</Alert> : 'Вы можете изменить имя или обновть фото'}
                     </Box>
 
 
@@ -194,7 +190,7 @@ export const ProfileUser: FC = () => {
                                     </HeaderButton>
                                     <HeaderButtonActive disabled={isLoadingPhotoProfile} type="submit">{isLoadingPhotoProfile ? 'Идет отправка' : 'Обновить фото'}</HeaderButtonActive>
                                 </Box>
-                                {errorState ? <p>{`${errorState}`}</p> : null}
+                                {errorState ? <Alert severity="error">{`${errorState}`}</Alert> : null}
                             </form>
                         </ItemGrid>
                     </Grid>

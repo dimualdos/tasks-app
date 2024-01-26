@@ -1,9 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "./hooks";
-import { addDoc, and, collection, doc, limit, onSnapshot, orderBy, query, updateDoc, where } from "firebase/firestore";
+import { and, collection,  onSnapshot, orderBy, query,  where } from "firebase/firestore";
 import { db } from "../utils/fire-base";
 import { ITasksUser } from "../utils/types";
-import { useProfile } from "./use-profile";
+
 
 // логика: если задача добавлена при помомщи кнопки "+добавить задачу"
 // но не завершена при помощи кнопки "создать задачу" 
@@ -46,11 +46,12 @@ export const useTaskList = () => {
         return () => unsubscribeTaskStatus();
     }, [userBaseData]);
 
-    // получение всего списка задач
+    // получение всего списка созданных до конца задач 
 
     useEffect(() => {
         if (!userBaseData) { return };
-        const unsubscribeTaskList = onSnapshot(numberTaskRef, snapshot => {
+        const q = query(numberTaskRef, where("statusEditDoc", "==", true));
+        const unsubscribeTaskList = onSnapshot(q, snapshot => {
             const dataTaskList = snapshot.docs.map(d => ({
                 ...(d.data() as ITasksUser),
                 _id: d.id,

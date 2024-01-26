@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { useAuth } from "./hooks";
-import { addDoc, and, collection, doc, limit, onSnapshot, orderBy, query, updateDoc, where } from "firebase/firestore";
+import { addDoc, and, collection, doc, getDoc, limit, onSnapshot, orderBy, query, setDoc, updateDoc, where } from "firebase/firestore";
 import { db } from "../utils/fire-base";
 import { ITasksUser } from "../utils/types";
 import { useProfile } from "./use-profile";
@@ -27,29 +27,13 @@ export const useTask = () => {
     const [isLoadingTask, setIsLoadingTask] = useState(false);
     const [isSuccesAddTask, setIsSuccessAddTask] = useState(false);
     const [errorStateTask, setErrorStateTask] = useState<unknown | null>(null);
+    const [isLoadingUpdateTask, setIsLoadingUpdateTask] = useState(false);
+    const [isSuccesUpdateTasks, setIsSuccessUpdateTask] = useState(false)
     const [numberTask, setNumberTask] = useState<ITasksUser>();
     const [queryEditDoc, setQueryEditDoc] = useState<any>();
 
     const numberTaskRef = collection(db, "tasksNumber");
-
-    // получение последней задачи для обновления номера следующей задачи
-
-    useEffect(() => {
-        if (!userBaseData) { return };
-        const q1 = query(numberTaskRef, orderBy("number", "desc"), limit(1));
-
-        const unsubscribe = onSnapshot(q1, snapshot => {
-            const dataNumber = snapshot.docs.map(d => ({
-                ...(d.data() as ITasksUser),
-                _id: d.id,
-            }))[0];
-            setNumberTask(dataNumber);
-        });
-        return () => unsubscribe();
-    }, [userBaseData]);
-
-    // получение задачи которую начал конкретный пользователь, которую начали ранее, но либо отменили либо вышли без сохранения
-
+// получение задач пользователя созданных но не заполненных
     useEffect(() => {
         if (!userBaseData) { return };
         const q = query(numberTaskRef, and(
@@ -71,14 +55,34 @@ export const useTask = () => {
     // проверка на то есть ли ранее созданная,
     // но не заплненная конкретным пользователем задача
     const chekedTasks = async () => {
-
-        const docRef = collection(db, "tasksNumber");
-        if (queryEditDoc && queryEditDoc.statusEditDoc === false) {
+        if (queryEditDoc && queryEditDoc!.statusEditDoc === false) {
             return
         } else if (!queryEditDoc?.length) {
             setIsLoadingTask(true);
+            const q1 = query(numberTaskRef, orderBy("number", "desc"), limit(1));
+
+            const unsubscribe = onSnapshot(q1, snapshot => {
+                const dataNumber = snapshot.docs.map(d => ({
+                    ...(d.data() as ITasksUser),
+                    _id: d.id,
+                }))[0];
+                setNumberTask(dataNumber);
+            });
+            
+            
+        /*  setTimeout(async () => {
+            if(!numberTask || numberTask === undefined) {
+                addDoc(collection(db, "tasksNumber"), {
+                    nameTask: "",
+                    number: 1,
+                    whoAddedTheTaskUserId: profile._id,
+                    statusEditDoc: false,
+                  });
+            } else return; 
+         }, 2000); */
+         
             try {
-                await addDoc(docRef, {
+                await addDoc(numberTaskRef, {
                     nameTask: "",
                     whoAddedTheTaskUserId: profile._id,
                     number: numberTask!.number! + 1,
@@ -86,7 +90,6 @@ export const useTask = () => {
                     statusEditDoc: false,
                     timeAdding: new Date().toUTCString(),
                 });
-
                 setIsSuccessAddTask(true);
 
                 setTimeout(() => {
@@ -102,7 +105,7 @@ export const useTask = () => {
                     setIsLoadingTask(false);
                     setIsSuccessAddTask(false);
                 }, 3000);
-
+                return () => unsubscribe();
             }
         }
     };
@@ -115,11 +118,12 @@ export const useTask = () => {
         taskStatus: string,
         direction: string,
         currentUser: string,
-        description: string
+        description: string,
+        idTask: string,
     ) => {
         setIsLoadingTask(true);
 
-        const taskRef = doc(db, "tasksNumber", `${numberTask!._id!}`);
+        const taskRef = doc(db, "tasksNumber", idTask);
 
         try {
             await updateDoc(taskRef, {
@@ -155,15 +159,49 @@ export const useTask = () => {
         }
     };
 
+    const updateTargetTask = async (
+           taskStatus: string,
+              idTask: string,
+    ) => {
+        setIsLoadingUpdateTask(true);
+        const taskRef = doc(db, "tasksNumber", idTask);
+        try {
+            await updateDoc(taskRef, {
+                taskStatus: taskStatus,
+            });
+            setTimeout(() => {
+                setIsSuccessUpdateTask(true);
+            }, 1000);
+
+        } catch (error) {
+            setErrorStateTask(error);
+            setIsLoadingUpdateTask(false);
+        } finally {
+            setTimeout(() => {
+                setIsLoadingUpdateTask(false);
+                setIsSuccessUpdateTask(false);
+            }, 3000);
+
+        }
+    };
     const valueTask = useMemo(() => ({
         queryEditDoc,
         numberTask,
         isLoadingTask,
         isSuccesAddTask,
         errorStateTask,
+        isLoadingUpdateTask,
+        isSuccesUpdateTasks,
         addNewTask,
         chekedTasks,
-    }), [queryEditDoc, numberTask, errorStateTask, isLoadingTask, isSuccesAddTask]);
+        updateTargetTask,
+    }), [  queryEditDoc, 
+        numberTask, 
+        errorStateTask,
+        isLoadingTask, 
+        isSuccesAddTask,
+        isLoadingUpdateTask,
+        isSuccesUpdateTasks]);
 
     return valueTask;
 }
