@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { FunctionComponent } from "react";
+import { FunctionComponent, useEffect, useMemo, useState } from "react";
 import { styled, alpha } from '@mui/material/styles';
 import Menu, { MenuProps } from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -9,7 +9,7 @@ import { BoldTextLeft, HeaderButtonFilters, OverflowFilter } from '../../constan
 import Checkbox from '@mui/material/Checkbox';
 import { useAppDispatch, useAppSelector } from '../../hooks/hooks';
 import { IChecked, ITasksUser } from '../../utils/types';
-import { setFilterDirection, setFilterExecutor, setFilterStatus } from '../../servises/actions/filter-data-actions';
+import { setFilterCreator, setFilterDirection, setFilterExecutor, setFilterStatus } from '../../servises/actions/filter-data-actions';
 import Modal from '../modal/modal';
 import { set } from 'date-fns';
 import { useDirections } from '../../hooks/use-direction';
@@ -83,30 +83,30 @@ const HeaderFilter: FunctionComponent = () => {
     const { usersListFB } = useUsersList();
 
     const dispatch = useAppDispatch();
-    const statuseList = useAppSelector(state => state.dataLists.statuseList);
-    const directionsList = useAppSelector(state => state.dataLists.directionsList);
-    const usersList = useAppSelector(state => state.dataLists.usersList);
-    const [checkedStatuseList, setCheckedStatuseList] = React.useState<any>([{}]);
-    const [checkedDirectionsList, setCheckedDirectionsList] = React.useState<any>([{}]);
-    const [checkedExecutorList, setCheckedExecutorList] = React.useState<any>([{}]);
-    const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+    // const statuseList = useAppSelector(state => state.dataLists.statuseList);
+    // const directionsList = useAppSelector(state => state.dataLists.directionsList);
+    // const usersList = useAppSelector(state => state.dataLists.usersList);
+    const [checkedStatuseList, setCheckedStatuseList] = useState<any>([{}]);
+    const [checkedDirectionsList, setCheckedDirectionsList] = useState<any>([{}]);
+    const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+    const [executorsDataList, setExecutorsDataList] = useState<any>([]);
+    const [creatorTaskList, setCreatorTaskList] = useState<any>();
     const [isOpen, setIsOpen] = React.useState(false);
+
 
 
     const setFunction = React.useCallback(() => {
         let statuseData: React.SetStateAction<any> = [];
         let directionsData: React.SetStateAction<any> = [];
-        let executorData: React.SetStateAction<any> = [];
+
         if ((tasksList && statusActive && directionsActive) &&
             (statusActive.length > 0 || directionsActive.length > 0 || tasksList.length > 0)) {
             statuseData = statusActive && statusActive.map((statuse: any) => (statuse = { name: statuse.name, id: statuse._id, checked: false }));
-            directionsData = directionsActive.map((directions: any, i: number) => (directions = { name: directions.name, id: directions._id, checked: false }));
-            executorData = usersList.map((executor: any) => (executor = { id: executor.executorTaskId, checked: false }));
+            directionsData = directionsActive.map((directions: any) => (directions = { name: directions.name, id: directions._id, checked: false }));
             setCheckedStatuseList(statuseData);
             setCheckedDirectionsList(directionsData);
-            setCheckedExecutorList(executorData);
         }
-    }, [directionsActive, statusActive, tasksList, usersList]);
+    }, [directionsActive, statusActive, tasksList]);
 
     const open = Boolean(anchorEl);
     const handleClickButton = () => {
@@ -118,7 +118,7 @@ const HeaderFilter: FunctionComponent = () => {
         setIsOpen(!isOpen);
         setAnchorEl(null);
     };
-    const universalCheckedFunction = (universalSetCheckedList: any, dataCheked: any[], event: React.ChangeEvent<HTMLInputElement>) => {
+    const universalCheckedFunction = useMemo(() => (universalSetCheckedList: any, dataCheked: any[], event: React.ChangeEvent<HTMLInputElement>) => {
         universalSetCheckedList([...dataCheked.map((item: IChecked) => {
 
             if (item.name === event.target.name && item.id === event.target.id) {
@@ -127,7 +127,7 @@ const HeaderFilter: FunctionComponent = () => {
             return item;
         }
         )]);
-    };
+    }, []);
 
     const handleChangeStatuseList = (event: React.ChangeEvent<HTMLInputElement>) => {
         universalCheckedFunction(setCheckedStatuseList, checkedStatuseList, event);
@@ -137,7 +137,7 @@ const HeaderFilter: FunctionComponent = () => {
         universalCheckedFunction(setCheckedDirectionsList, checkedDirectionsList, event);
     };
     const handleChangeExecutorList = (event: React.ChangeEvent<HTMLInputElement>) => {
-        universalCheckedFunction(setCheckedExecutorList, checkedExecutorList, event);
+        universalCheckedFunction(setExecutorsDataList, executorsDataList, event);
 
         // setCheckedExecutorList([...checkedExecutorList.map((item: IChecked) => {
         //     if (item.name === event.target.name && item.id === event.target.id) {
@@ -147,42 +147,90 @@ const HeaderFilter: FunctionComponent = () => {
         // }
         // )]);
     };
-    const exec = tasksList && tasksList.length > 0 && tasksList.map((executor: ITasksUser, i) => {
-        const executorName: any = usersListFB!.find((item: any) => item._id === executor.executorTaskId);
 
-        return executorName
-    });
+    const handleChangeCreateTaskUserList = (event: React.ChangeEvent<HTMLInputElement>) => {
+        universalCheckedFunction(setCreatorTaskList, creatorTaskList, event);
+    };
 
-    const exec1 = usersListFB && usersListFB.length > 0 && usersListFB.map((executor: any) => {
-        const executorName: any = tasksList!.find((item: any) => item.executorTaskId === executor._id);
+    // Логика получения исполнителей из списка задач,
+    useEffect(() => {
 
-        return executorName
-    })
-    console.log(exec1);
-    console.log(tasksList);
-    console.log(usersListFB)
+        let arrExecutors: any = [];
+        let setUsersExecutor: any = new Set();
 
-    React.useEffect(() => {
+        const usersExecutor = tasksList && tasksList!.map((executor: any) => {
+            const executorName1 = usersListFB && usersListFB.find((item: any) => item!._id === executor.executorTaskId);
+            return executorName1
+        });
 
+        if (!usersExecutor) return;
+        for (let i = 0; i < usersExecutor!.length; i++) {
+            if (usersExecutor[i]) {
+                setUsersExecutor.add(usersExecutor[i]);
+            }
+        };
+        for (let item of setUsersExecutor) {
+            arrExecutors.push({ name: item.displayName, id: item._id, checked: false });
+        }
+        if (arrExecutors.length === 0 || arrExecutors === undefined) return;
+        setExecutorsDataList(
+            [...arrExecutors]
+        );
+
+    }, [tasksList, usersListFB]);
+    // логика получения списка пользователей (из спика задач), создавших задачи 
+    useEffect(() => {
+        let arrCreators: any = [];
+        let setUsersCreator: any = new Set();
+
+        const usersCreators = tasksList && tasksList!.map((creator: any) => {
+            const creatorName = usersListFB && usersListFB.find((item: any) => item!._id === creator.whoAddedTheTaskUserId);
+            return creatorName
+        });
+
+        if (!usersCreators) return;
+        for (let i = 0; i < usersCreators!.length; i++) {
+
+            if (usersCreators[i]) {
+                setUsersCreator.add(usersCreators[i]);
+            }
+        };
+        for (let item of setUsersCreator) {
+            arrCreators.push({ name: item.displayName, id: item._id, checked: false });
+        }
+
+        if (arrCreators.length === 0 || arrCreators === undefined) return;
+        setCreatorTaskList(
+            [...arrCreators]
+        );
+
+    }, [tasksList, usersListFB])
+
+    useEffect(() => {
+        // отправление отфильтрованных статусов, исполнителей, направлений, создателей в stor
         let status: any = [];
-        let executor: any = [];
         let direction: any = [];
+        let executor: any = [];
+        let creator: any = [];
         if (checkedStatuseList.length > 0) {
-            status = checkedStatuseList.filter((item: IChecked) => item.checked === true).map((item: IChecked) => item);
+            status = checkedStatuseList.filter((item: IChecked) => item.checked === true);
             dispatch(setFilterStatus(status));
         };
-        if (checkedExecutorList.length > 0) {
-            executor = checkedExecutorList.filter((item: IChecked) => item.checked === true).map((item: IChecked) => item);
+
+        if (checkedDirectionsList.length > 0) {
+            direction = checkedDirectionsList.filter((item: IChecked) => item.checked === true)
+            dispatch(setFilterDirection(direction));
+        };
+        if (executorsDataList && executorsDataList.length > 0) {
+            executor = executorsDataList.filter((item: IChecked) => item.checked === true);
             dispatch(setFilterExecutor(executor));
         };
-        if (checkedDirectionsList.length > 0) {
-            direction = checkedDirectionsList.filter((item: IChecked) => item.checked === true).map((item: IChecked) => item);
-            dispatch(setFilterDirection(direction));
-            console.log(direction)
+        if (creatorTaskList && creatorTaskList.length > 0) {
+            creator = creatorTaskList.filter((item: IChecked) => item.checked === true);
+            dispatch(setFilterCreator(creator));
+        }
 
-        };
-
-    }, [checkedDirectionsList, checkedExecutorList, checkedStatuseList, dispatch]);
+    }, [checkedDirectionsList, checkedStatuseList, creatorTaskList, dispatch, executorsDataList]);
 
 
     return (
@@ -226,7 +274,7 @@ const HeaderFilter: FunctionComponent = () => {
                             return (
                                 <MenuItemNew disableRipple key={i}>
                                     <Checkbox
-                                        checked={checkedDirectionsList && checkedDirectionsList.filter((item: IChecked) => item.name === directions.name && item.id === directions._id).checked}
+                                        checked={checkedDirectionsList.checked}
                                         onChange={e => handleChangeDirectionsList(e)}
                                         inputProps={{ 'aria-label': 'controlled' }}
                                         name={directions.name}
@@ -239,44 +287,42 @@ const HeaderFilter: FunctionComponent = () => {
                         })}
                         {/* <Divider sx={{ my: 0.5 }} /> */}
                         <BoldTextLeft>Исполнитель</BoldTextLeft>
-                        {tasksList && tasksList.length > 0 && tasksList.map((executor: ITasksUser, i) => {
-                            const executorName = usersList && usersList.filter((item: { _id: string, name: string; }) =>
-                                item._id === executor.executorTaskId);
-                            console.log(executorName)
+                        {executorsDataList && executorsDataList!.map((executor: any) => {
                             return (
-                                <MenuItemNew disableRipple key={i}>
+                                <MenuItemNew disableRipple key={executor.id}>
                                     <Checkbox
                                         color="secondary"
-                                        checked={checkedExecutorList && checkedExecutorList.filter((item: IChecked) =>
-                                            item.id === executor._id).checked}
+                                        checked={executorsDataList.checked}
                                         onChange={e => handleChangeExecutorList(e)}
                                         inputProps={{ 'aria-label': 'controlled' }}
-                                        // name={executorName.name}
-                                        id={executor._id}
+                                        name={executor.name}
+                                        id={executor.id}
                                     />
-                                    {/* {executorName.name} */}
+                                    {executor.name}
                                 </MenuItemNew>
                             )
                         })}
 
                         <BoldTextLeft>Создатель</BoldTextLeft>
-                        <MenuItemNew disableRipple>
-                            <Checkbox
-                                color="secondary"
-                                // checked={checked}
-                                // onChange={e => handleChange(e, i)}
-
-                                inputProps={{ 'aria-label': 'controlled' }}
-                            />
-                            Динамический чел/хз как его вставить
-                        </MenuItemNew>
+                        {creatorTaskList && creatorTaskList.map((creator: any) => {
+                            return (
+                                <MenuItemNew disableRipple key={creator.id}>
+                                    <Checkbox
+                                        color="secondary"
+                                        checked={creatorTaskList.checked}
+                                        onChange={e => handleChangeCreateTaskUserList(e)}
+                                        inputProps={{ 'aria-label': 'controlled' }}
+                                        name={creator.name}
+                                        id={creator.id}
+                                    />
+                                    {creator.name}
+                                </MenuItemNew>
+                            )
+                        })}
 
                     </Box>
                 </OverflowFilter>
             </Modal>)}
-
-
-
         </Box>
     );
 };

@@ -1,4 +1,4 @@
-import { FunctionComponent } from "react";
+import { FunctionComponent, useMemo } from "react";
 import { Spinner } from "../components/spinner/spinner";
 import { styled } from "@mui/material/styles";
 import Paper from "@mui/material/Paper";
@@ -87,22 +87,29 @@ const DataItemsList = () => {
     const { tasksList } = useTaskList();
     const { usersListFB } = useUsersList();
     const { statusListFB } = useStatus();
-    const { statusListData, directionsListData, executorsListData } = useAppSelector(state => state.filterData);
+    const { statusListData, directionsListData, executorsListData, creatorsListData } = useAppSelector(state => state.filterData);
+
+    if (statusListData.length > 0) console.log(statusListData);
+    if (directionsListData.length > 0) console.log(directionsListData);
+    if (executorsListData.length > 0) console.log(executorsListData)
 
 
-    const items = tasksList && tasksList.sort((a, b) => b.number - a.number).filter((item: ITasksUser) => {
-        if (statusListData.length === 0 && directionsListData.length === 0) {
+    const items = useMemo(() => tasksList && tasksList.sort((a, b) => b.number - a.number).filter((item: ITasksUser) => {
+        // если нет листа задач, статусов, направлений исполнителе, создателей
+        if (statusListData.length === 0 && directionsListData.length === 0 && executorsListData.length === 0 && creatorsListData.length === 0) {
             return item;
         }
-        else if ((item.taskStatus !== null || item.taskDirection !== null) && (
-            statusListData.findIndex((elem: { id: string }) => elem.id === item.taskStatus) > -1 ||
-            directionsListData.findIndex((elem: { id: string }) => elem.id === item.taskDirection) > -1)
-        ) {
-            console.log(item)
+        else if ((item.taskStatus !== null || item.taskDirection !== null || item.executorTaskId !== null || item.whoAddedTheTaskUserId !== null) && (
+            // поиск листа статусов, направлений исполнителе, создателей и сравниваем его id с id задачи, направления, исполнителя, создателя
+            statusListData.find((elem: { id: string }) => elem.id === item.taskStatus) ||
+            directionsListData.find((elem: { id: string }) => elem.id === item.taskDirection) ||
+            executorsListData.find((elem: { id: string }) => elem.id === item.executorTaskId) ||
+            creatorsListData.find((elem: { id: string }) => elem.id === item.whoAddedTheTaskUserId)
+        )) {
             return item;
         }
     }).map((itemTasks) => {
-        // console.log(directionsListFB);
+        // создание листа задач
         const statusName: { name: string, _id: string } = statusListFB!.find((item: any) => item._id === itemTasks.taskStatus);
         const directionName: { name: string, _id: string } = directionsListFB!.find((item: any) => item._id === itemTasks.taskDirection);
         const executorName: any = usersListFB!.find((item: any) => item._id === itemTasks.executorTaskId);
@@ -141,7 +148,7 @@ const DataItemsList = () => {
                 </Grid>
             </Grid>
         )
-    })
+    }), [tasksList, statusListData, directionsListData, executorsListData, statusListFB, directionsListFB, usersListFB]);
 
     return (
         <Grid container justifyContent="center"  >

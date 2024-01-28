@@ -134,4 +134,5 @@ export interface ITasksUser {
     taskDirection: string,
     taskStatus: string,
     timeAdding: string,
+    filter?: ()=> void
 }
