@@ -4,6 +4,7 @@
     padding: 10px 10px;
     min-height: 160px;
 
+
 }
 
 
@@ -15,4 +16,7 @@
 
 .reactQuillStyle>div[class="ql-toolbar ql-snow"] {
     border: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
 }

@@ -15,12 +15,3 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-
-.dark-theme {
-  background: linear-gradient(to right, #01333F, #02124A) transparent;
-}
-
-.light-theme {
-  background: linear-gradient(to right, #0C5D71, #041654) transparent;
-
-}

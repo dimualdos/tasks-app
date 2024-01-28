@@ -35,9 +35,10 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
 }));
 export interface IDataTasks {
     data?: React.ReactNode;
+    imageSrc?: any
 }
 
-export const BadgeAvatars: React.FunctionComponent<IDataTasks> = ({ data }) => {
+export const BadgeAvatars: React.FunctionComponent<IDataTasks> = ({ imageSrc, data }) => {
     return (
         <Stack direction="row" spacing={2} alignItems={'center'} gap={'10px'}>
             <StyledBadge
@@ -45,7 +46,7 @@ export const BadgeAvatars: React.FunctionComponent<IDataTasks> = ({ data }) => {
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 variant="dot"
             >
-                <Avatar alt="Remy Sharp" src="../../images/avatar.jpg" />
+                <Avatar alt="Remy Sharp" src={imageSrc} />
             </StyledBadge>
             {data ? data : null}
         </Stack>

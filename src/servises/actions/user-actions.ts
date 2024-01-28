@@ -35,7 +35,6 @@ export const joinChat = () => (dispatch: AppDispatch) => {
     .then(data => {
       const { success, ...userData } = data;
 
-      console.log(userData)
       dispatch({
         type: JOIN_CHAT_SUCCESS,
         user: userData

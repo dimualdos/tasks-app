@@ -1,71 +1,75 @@
 import { useCallback, FunctionComponent, FormEvent } from 'react';
-import { Link } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { useForm, useAuth } from '../hooks/hooks';
+import Grid from "@mui/material/Unstable_Grid2";
 
-import { useForm, useAppDispatch } from '../hooks/hooks';
-// import { TStateReducer } from '../services/reducers';
-// import { loginUser } from '../services/actions/auth';
-import styles from './css/page.module.css';
-import TextField from '@mui/material/TextField';
+import { HeaderButtonActive } from '../constants/constant-mui';
+import { InputAdornments } from '../components/custom-input/custom-input';
+import { Box } from '@mui/material';
+import styles from './css/pages.module.css';
+
 
 
 export const LoginPage: FunctionComponent = () => {
-    const dispatch: any = useAppDispatch();
-    const { values, handleChange } = useForm({ email: '', password: '' });
+    const { login, isLoading } = useAuth();
+    const { dataForm, handleChange } = useForm({ email: '', password: '' });
 
-    // const { loginUserRequest } = useSelector((state: TStateReducer) => state.user);
-
-    const handleClick = useCallback(
-        (e: FormEvent<HTMLFormElement>) => {
-            e.preventDefault();
-            // if (loginUserRequest) return;
-            // dispatch(loginUser(values));
-        }, [dispatch, values]);
+    const handleClick = useCallback(async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const { email, password } = dataForm;
+        await login(email, password);
+    }, [login, dataForm]);
 
     return (
-        <section className={styles.section}>
-            <div className={styles.container}>
+        <Grid container sx={{
+            justifyContent: 'center'
+        }} xs={12}
+        >
+            <Grid xs={12} sm={6} md={6} lg={4} >
                 <form
                     onSubmit={handleClick}
                     className={styles.form}>
-                    <h1 className={styles.heading}>Вход</h1>
-                    <TextField
-                        placeholder="E-mail"
-                        value={values.email}
-                        name="email"
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e)} />
+                    <Grid sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: '20px', "::first-of-type": { textAlign: 'center' },
+                        ":last-child": { alignContent: "center" }
+                    }} xl={12} md={8}>
+                        <h1 >Вход</h1>
 
-                    <TextField
-                        placeholder="Пароль"
-                        value={values.password}
-                        name="password"
-                        onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e)}
-                    />
-                    <button
-                        type='submit'
-                        className={styles.buttonConstructor}>
-                        <p className={styles.buttonText}>Войти</p>
-                    </button>
+                        <InputAdornments
+                            placeholderInput="E-mail"
+                            valueInput={dataForm.email}
+                            nameInput="email"
+                            typeInput="email"
+                            onChangeInput={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e)}
+                            ariaLabelInput="E-mail"
+                        />
+                        <InputAdornments
+                            placeholderInput="Пароль"
+                            valueInput={dataForm.password}
+                            nameInput="password"
+                            typeInput='password'
+                            onChangeInput={(e: React.ChangeEvent<HTMLInputElement>) => handleChange(e)}
+                            ariaLabelInput="password"
+
+                        />
+
+                        <Box >
+                            <HeaderButtonActive
+                                type='submit'
+                                className={styles.buttonConstructor}>
+                                <p className={styles.buttonText}>Войти</p>
+                            </HeaderButtonActive>
+
+                        </Box>
+
+                    </Grid>
+
                 </form>
+            </Grid>
 
-                {/* <div className={styles.containerBottom}>
-                    <div className={styles.divPerson}>
-                        <p className={styles.textPerson}>Вы - новый пользователь?
-                            <Link to={{ pathname: `/register` }}
-                                className={styles.textLinkPerson}> Зарегистрироваться</Link>
-                        </p>
-                    </div>
 
-                    <div className={styles.divPerson}>
-                        <p className={styles.textPerson}>Забыли пароль?
-                            <Link to={{ pathname: `/forgot-password` }}
-                                className={styles.textLinkPerson}> Восстановить пароль</Link>
-                        </p>
-                    </div>
-                </div> */}
-
-            </div>
-        </section>
+        </Grid>
 
     )
 }

@@ -1,9 +1,7 @@
 import { useEffect, FC, ReactNode } from 'react';
 import ReactDOM from 'react-dom';
-import CloseIcon from '@mui/icons-material/Close';
 import ModalOverlay from '../modal-overlay/modal-overlay';
-import styles from '@emotion/styled';
-import { Box, styled } from '@mui/material';
+import { StyledBoxOverlay } from '../../constants/constant-mui';
 
 
 const modalItems: HTMLElement | null = document.getElementById('modals');
@@ -12,37 +10,10 @@ type TModal = {
     children: ReactNode;
     onClose: () => void;
     overlay: boolean;
+    tasksOverlay?: boolean
 };
-export const StyledLink = styled(Box)(({ theme }) => ({
-    backgroundColor: theme.palette.mode === "dark" ? theme.palette.primary.light : theme.palette.primary.main,
-    flexDirection: "column",
-    display: "flex",
-    flexWrap: "wrap",
-    boxSizing: "border-box",
-    maxWidth: "720px",
-    maxHeight: "80vh",
-    zIndex: "15",
-    alignItems: "center",
-    justifyContent: "center",
-    position: "fixed",
-    top: "47%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    borderRadius: "6px",
-    padding: "6px 6px",
-}))
 
-
-const headerLink = styles.div`
-  display: flex;
-  box-sizing: border-box;
-  flex-direction: row;
-  justify-content: flex-end;
-  gap: 36px;
-`;
-
-
-const Modal: FC<TModal> = ({ onClose, children, overlay = true }) => {
+const Modal: FC<TModal> = ({ onClose, children, overlay = true, tasksOverlay = false }) => {
     useEffect(() => {
         const removeModal = (e: KeyboardEvent) => {
             e.key === 'Escape' && onClose();
@@ -61,7 +32,7 @@ const Modal: FC<TModal> = ({ onClose, children, overlay = true }) => {
 
     return ReactDOM.createPortal(
         <>
-            <StyledLink >
+            <StyledBoxOverlay >
                 {/* <headerLink>
                     <div
                         className={styles.icon}
@@ -71,11 +42,11 @@ const Modal: FC<TModal> = ({ onClose, children, overlay = true }) => {
                         <CloseIcon type="primary" />
                     </div>
                 </headerLink> */}
-                <div >
-                    {children}
-                </div>
-            </StyledLink>
-            {overlay ? (<ModalOverlay onClose={onClose} />) : null}
+
+                {children}
+
+            </StyledBoxOverlay>
+            {overlay ? (<ModalOverlay taskOverlay={tasksOverlay} onClose={onClose} />) : null}
         </>, modalItems!
     )
 }

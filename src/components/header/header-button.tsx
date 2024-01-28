@@ -2,7 +2,7 @@ import Button from '@mui/material/Button'
 import Box from '@mui/material/Box';
 import ButtonGroup from '@mui/material/ButtonGroup';
 import { Link, useLocation } from "react-router-dom";
-import { HeaderButton, HeaderButtonActiveCompose } from '../app/getDesignTokens';
+import { HeaderButton, HeaderButtonActiveCompose } from '../../constants/constant-mui';
 
 ;
 
@@ -20,7 +20,7 @@ export default function GroupHeaderButtons() {
                 },
             }}
         >
-            <ButtonGroup size="small" aria-label="small button group">
+            <ButtonGroup size="small" aria-label="small button group" sx={{ cursor: 'pointer' }}>
                 <Link to={'board-tasks'}>{location?.pathname === '/board-tasks'
                     ? <HeaderButtonActiveCompose variant="contained" key={"one"}>Доска</HeaderButtonActiveCompose>
                     : < HeaderButton sx={{ borderRight: 'none' }} variant="contained" key={"two"}>Доска</ HeaderButton>}</Link>

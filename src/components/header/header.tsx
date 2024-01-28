@@ -17,65 +17,22 @@ import SearchIcon from '@mui/icons-material/Search';
 import GroupHeaderButtons from './header-button';
 import HeaderFilter from './header-filter';
 import { CustomizedSwitches } from '../tabs-radio/tabs-radio';
-import { Link, useLocation } from 'react-router-dom';
-import { HeaderButtonActive } from '../app/getDesignTokens';
-
-const settings = ['Profile', 'Account', 'Dashboard', 'Logout'];
-
-const Search = styled('div')(({ theme }) => ({
-    position: 'relative',
-    borderRadius: theme.shape.borderRadius,
-    backgroundColor: alpha(theme.palette.common.white, 0.70),
-    '&:hover': {
-        backgroundColor: alpha(theme.palette.common.white, 0.35),
-    },
-    marginLeft: 0,
-    width: '100%',
-    [theme.breakpoints.up('sm')]: {
-        marginLeft: theme.spacing(1),
-        width: 'auto',
-    },
-}));
-
-const SearchIconWrapper = styled('div')(({ theme }) => ({
-    padding: theme.spacing(0, 2),
-    height: '100%',
-    position: 'absolute',
-    pointerEvents: 'none',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-}));
-
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
-    color: 'inherit',
-    '& .MuiInputBase-input': {
-        padding: theme.spacing(1, 1, 1, 0),
-        // vertical padding + font size from searchIcon
-        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
-        transition: theme.transitions.create('width'),
-        width: '100%',
-        [theme.breakpoints.up('sm')]: {
-            width: '12ch',
-            '&:focus': {
-                width: '20ch',
-            },
-        },
-    },
-}));
-
-const StyledLink = styled(Link)(({ theme }) => ({
-    color: 'inherit',
-    textDecoration: 'none',
-}));
-
+import { useLocation } from 'react-router-dom';
+import { userDataPath } from './user-links';
+import { StyledLink } from '../../constants/constant-mui';
+import { useAuth } from '../../hooks/hooks';
+import { auth } from '../../utils/fire-base';
+import { useProfile } from '../../hooks/use-profile';
+import { AddTaskApp } from '../../pages';
 
 
 function Header() {
     let location = useLocation();
+    const { logout } = useAuth();
+    const { profile } = useProfile();
+    const user = auth.currentUser;
     const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
     const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
-
     const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
         setAnchorElNav(event.currentTarget);
     };
@@ -145,11 +102,12 @@ function Header() {
                                 display: { xs: 'block', md: 'none' },
                             }}
                         >
-                            {/*  Тут должен быть компонент для отображения задач и фильтрации */}
+                            {/*   компонент для отображения задач и фильтрации */}
 
-                            <Link to={'add-task'}>
-                                <HeaderButtonActive size="small" variant="contained">+ Добавить задачу</HeaderButtonActive>
-                            </Link>
+                            <Box >
+                                {user && <AddTaskApp />}
+                            </Box>
+
                             {/* Группа кнопок */}
                             <GroupHeaderButtons />
                             {/* фильтр кнопка */}
@@ -174,14 +132,17 @@ function Header() {
                             LOGO
                         </StyledLink>
                     </Typography>
-                    {/*  Тут должен быть компонент для отображения задач и фильтрации */}
+
+                    {/*   компонент для отображения задач и фильтрации */}
                     <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
-                        <Link to={'add-task'}>
-                            <HeaderButtonActive size="small" variant="contained">+ Добавить задачу</HeaderButtonActive>
-                        </Link>
+                        <Box >
+                            {user && <AddTaskApp />}
+                        </Box>
                     </Box>
+
                     <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
                         <GroupHeaderButtons />
+                        {/* фильтр кнопка */}
                         {location.pathname === '/list-tasks' ? <HeaderFilter /> : null}
                     </Box>
                     {/* поисковое поле */}
@@ -201,40 +162,104 @@ function Header() {
                     <Box sx={{ mr: 2 }}>
                         <CustomizedSwitches />
                     </Box>
+                    {/* пользователь приложения  */}
+                    {user ? (
+                        <Box sx={{ flexGrow: 0 }}>
+                            <Tooltip title="Open settings">
+                                <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
+                                    {profile && profile.photoURL ? <Avatar alt="name" src={profile.photoURL} /> : <Avatar alt="name" />}
+                                </IconButton>
+                            </Tooltip>
 
-                    <Box sx={{ flexGrow: 0 }}>
-                        <Tooltip title="Open settings">
-                            <IconButton onClick={handleOpenUserMenu} sx={{ p: 0 }}>
-                                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
-                            </IconButton>
-                        </Tooltip>
+                            <Menu
+                                sx={{ mt: '45px' }}
+                                id="menu-appbar"
+                                anchorEl={anchorElUser}
+                                anchorOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
+                                }}
+                                keepMounted
+                                transformOrigin={{
+                                    vertical: 'top',
+                                    horizontal: 'right',
+                                }}
+                                open={Boolean(anchorElUser)}
+                                onClose={handleCloseUserMenu}
+                            >
 
-                        <Menu
-                            sx={{ mt: '45px' }}
-                            id="menu-appbar"
-                            anchorEl={anchorElUser}
-                            anchorOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                            }}
-                            keepMounted
-                            transformOrigin={{
-                                vertical: 'top',
-                                horizontal: 'right',
-                            }}
-                            open={Boolean(anchorElUser)}
-                            onClose={handleCloseUserMenu}
-                        >
-                            {settings.map((setting) => (
-                                <MenuItem key={setting} onClick={handleCloseUserMenu}>
-                                    <Typography textAlign="center">{setting}</Typography>
-                                </MenuItem>
-                            ))}
-                        </Menu>
-                    </Box>
+                                {/* массив ссылок пользователя */}
+                                <Box>
+                                    {userDataPath.map((setting, i) => {
+                                        return (
+
+                                            <MenuItem key={i} onClick={handleCloseUserMenu}>
+                                                <StyledLink to={setting.path}>
+                                                    <Typography textAlign="center">{setting.text}</Typography>
+                                                </StyledLink>
+                                            </MenuItem>
+                                        )
+                                    }
+                                    )}
+
+                                </Box>
+                                <Box onClick={handleCloseUserMenu}>
+                                    <MenuItem onClick={logout}>Выйти</MenuItem>
+
+                                </Box>
+                            </Menu>
+                        </Box>
+                    ) : null}
                 </Toolbar>
             </Container>
         </AppBar >
     );
 }
 export default Header;
+
+
+
+const Search = styled('div')(({ theme }) => ({
+    position: 'relative',
+    borderRadius: theme.shape.borderRadius,
+    backgroundColor: alpha(theme.palette.common.white, 0.70),
+    '&:hover': {
+        backgroundColor: alpha(theme.palette.common.white, 0.35),
+    },
+    marginLeft: 0,
+    width: '100%',
+    [theme.breakpoints.up('sm')]: {
+        marginLeft: theme.spacing(1),
+        width: 'auto',
+    },
+}));
+
+const SearchIconWrapper = styled('div')(({ theme }) => ({
+    padding: theme.spacing(0, 2),
+    height: '100%',
+    position: 'absolute',
+    pointerEvents: 'none',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+}));
+
+const StyledInputBase = styled(InputBase)(({ theme }) => ({
+    color: 'inherit',
+    '& .MuiInputBase-input': {
+        color: 'black',
+
+        padding: theme.spacing(1, 1, 1, 0),
+        // vertical padding + font size from searchIcon
+        paddingLeft: `calc(1em + ${theme.spacing(4)})`,
+        transition: theme.transitions.create('width'),
+        width: '100%',
+        [theme.breakpoints.up('sm')]: {
+            width: '12ch',
+            '&:focus': {
+                width: '20ch',
+            },
+        },
+    },
+}));
+
